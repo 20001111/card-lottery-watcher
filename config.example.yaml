@@ -1,0 +1,58 @@
+timezone: Asia/Tokyo
+digest_hour: 7
+digest_minute: 30
+request_timeout_seconds: 20
+
+preferences:
+  base_station: 水道橋
+  max_travel_minutes: 90
+  pickup_prefectures: [東京都, 千葉県, 埼玉県, 神奈川県]
+
+# true/false/null（不明）で登録します。注文番号などの個人情報は保存しません。
+eligibility:
+  pokemon_center:
+    account: true
+    phone_verified: null
+  geo:
+    account: null
+    app_installed: null
+    purchase_history: null
+  joshin:
+    account: null
+    purchase_history: null
+  cardbox:
+    account: null
+    purchase_history: null
+
+# discovery は発見用、official は裏取り用です。
+sources:
+  - name: ポケモンセンターオンライン
+    store_key: pokemon_center
+    kind: official
+    category: pokemon
+    url: https://www.pokemoncenter-online.com/news/
+  - name: ONE PIECEカード公式TOPICS
+    store_key: onepiece_official
+    kind: official
+    category: onepiece
+    url: https://www.onepiece-cardgame.com/topics/
+  - name: 入荷Now ポケカ
+    store_key: nyuka_now
+    kind: discovery
+    category: pokemon
+    url: https://nyuka-now.com/archives/2459
+  - name: 入荷Now ワンピース
+    store_key: nyuka_now
+    kind: discovery
+    category: onepiece
+    url: https://nyuka-now.com/archives/97393
+  - name: カード抽選販売まとめ
+    store_key: cardchusen
+    kind: discovery
+    category: both
+    url: https://cardchusen.com/
+  - name: ポケカウォッチ
+    store_key: pokecawatch
+    kind: discovery
+    category: pokemon
+    url: https://pokecawatch.com/category/%E6%8A%BD%E9%81%B8%E3%83%BB%E4%BA%88%E7%B4%84%E6%83%85%E5%A0%B1
