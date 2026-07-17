@@ -7,9 +7,10 @@ from zoneinfo import ZoneInfo
 import requests
 import yaml
 
+from .ai_extract import extract_with_ai, page_document
 from .discord_notify import send_heading, send_or_update
 from .eligibility import evaluate
-from .parser import parse_source
+from .models import Lottery
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "data" / "lotteries.json"
@@ -35,7 +36,27 @@ def main():
         try:
             response = requests.get(source["url"], headers=headers, timeout=config.get("request_timeout_seconds", 20))
             response.raise_for_status()
-            for item in parse_source(response.text, source, now):
+            document, allowed_links = page_document(response.text, source["url"])
+            extracted = extract_with_ai(source, document, allowed_links, now, config)
+            for raw in extracted:
+                identity_source = f"{raw['store']}|{raw['title']}|{raw['application_url']}"
+                import hashlib
+                identity = hashlib.sha256(identity_source.encode()).hexdigest()[:20]
+                conditions = list(raw.get("requirements") or [])
+                item = Lottery(
+                    id=identity,
+                    title=raw["title"],
+                    category=raw["card_type"],
+                    store=raw["store"],
+                    store_key=source.get("store_key", "unknown"),
+                    source_url=source["url"],
+                    application_url=raw["application_url"],
+                    deadline=raw["deadline"],
+                    start_at=raw.get("start_at"),
+                    conditions=conditions,
+                    source_kind=source.get("kind", "discovery"),
+                    official_confirmed=source.get("kind") == "official",
+                )
                 collected[item.id] = evaluate(item, config.get("eligibility", {}))
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")

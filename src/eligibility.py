@@ -12,7 +12,7 @@ def evaluate(lottery, profile: dict):
         "クレジットカード": "credit_card_registered",
     }
     for label, key in checks.items():
-        if label not in lottery.conditions:
+        if not any(label in condition for condition in lottery.conditions):
             continue
         value = data.get(key)
         if value is False:
@@ -29,4 +29,3 @@ def evaluate(lottery, profile: dict):
         lottery.eligibility = "eligible" if lottery.official_confirmed else "unknown"
     lottery.eligibility_reasons = reasons
     return lottery
-
