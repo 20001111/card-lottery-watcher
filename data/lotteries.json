@@ -1,1 +1,259 @@
-[]
+[
+  {
+    "id": "8e51bbed3b3c01954dd5",
+    "title": "ポケモンカード ストームエメラルダ・スターターセットex各種 アプリ抽選（ジョーシン）",
+    "category": "pokemon",
+    "store": "ジョーシン（アプリ）",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://shop.joshin.co.jp/app/",
+    "deadline": "2026-07-20T23:59:00+09:00",
+    "start_at": "2026-07-17T00:00:00+09:00",
+    "conditions": [
+      "ジョーシンアプリのマイページ＞店舗限定キャンペーンエントリーより応募",
+      "ジョーシンカードに購入履歴がある会員が対象"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "購入履歴を要確認",
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1528544573977006141"
+  },
+  {
+    "id": "a2d73d5a679c3b684c29",
+    "title": "ONE PIECEカードゲーム ブースターパック 決戦の刻【OP-16】抽選販売",
+    "category": "onepiece",
+    "store": "ONE PIECE 麦わらストア 各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://www.mugiwara-store.com/news/2560/",
+    "deadline": "2026-07-20T23:59:00+09:00",
+    "start_at": "2026-07-18T00:00:00+09:00",
+    "conditions": [
+      "対象店舗：ONE PIECE 麦わらストア 渋谷本店／池袋店／お台場店／名古屋店／あべの店／梅田店／福岡店／熊本店／MUGIWARA STORE HARAJUKU／東京駅店",
+      "LivePocketへの会員登録が必要",
+      "WEB抽選受付",
+      "当選者は店頭販売"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1528544576917209169"
+  },
+  {
+    "id": "2d5ed578592e95cad271",
+    "title": "ONE PIECEカードゲーム ブースターパック 神の島の冒険【OP-15】、蒼海の七傑 OP-14、受け継がれる意志 抽選販売",
+    "category": "onepiece",
+    "store": "プレミアムバンダイ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://p-bandai.jp/carddas/a0018/",
+    "deadline": "2026-07-23T23:00:00+09:00",
+    "start_at": "2026-07-17T11:00:00+09:00",
+    "conditions": [
+      "抽選販売（先着順ではありません）",
+      "おひとり様1個まで",
+      "決済方法：クレジットカード前払い／プレバンPay／ペイディ",
+      "クーポン・プレミアムポイント使用不可",
+      "返品不可（商品不良時除く）",
+      "会員登録（無料）が必要"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認",
+      "クレジットカードを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1528544579706683503"
+  },
+  {
+    "id": "b84962db7f2c92f37dc0",
+    "title": "ポケモンカード ストームエメラルダ・スターターセットex各種 アプリ抽選（コジマ）",
+    "category": "pokemon",
+    "store": "コジマ（アプリ）",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.kojima.net/shop/app/kojima_appli.html",
+    "deadline": "2026-07-24T23:59:00+09:00",
+    "start_at": "2026-07-17T21:00:00+09:00",
+    "conditions": [
+      "コジマxビックカメラカードまたはコジマクレジット&ポイントカードをコジマアプリでポイントカード共通利用登録"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1528544582340444333"
+  },
+  {
+    "id": "ad50e6f098aa642c3b20",
+    "title": "ポケモンカード ストームエメラルダ・スターターセットex各種 アプリ抽選（ポケモンセンター各店）",
+    "category": "pokemon",
+    "store": "ポケモンセンター各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://shop.pokemon.co.jp/ja/shop/common/news/202607/000393.html",
+    "deadline": "2026-07-24T23:59:00+09:00",
+    "start_at": "2026-07-22T14:00:00+09:00",
+    "conditions": [
+      "LINEミニアプリ通知",
+      "対象店舗：シブヤ、スカイツリー、ヨコハマ、オーサカ、オーサカDX、キョウト、カナザワ、カガワ"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1528544585071067337"
+  },
+  {
+    "id": "86a5197bc591a5876f3b",
+    "title": "ポケモンカード ストームエメラルダ WEB抽選（ファミマオンライン）",
+    "category": "pokemon",
+    "store": "ファミマオンライン",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://famima-online.family.co.jp/item?itemCode=100161237379677400",
+    "deadline": "2026-07-20T23:59:00+09:00",
+    "start_at": "2026-07-15T10:00:00+09:00",
+    "conditions": [],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544587654631546"
+  },
+  {
+    "id": "e9447e221b256f64f1c1",
+    "title": "ONE PIECEカードゲーム ブースターパック 決戦の刻【OP-16】抽選販売",
+    "category": "onepiece",
+    "store": "ONE PIECEカードゲーム公式ショップ各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://parks2.bandainamco-am.co.jp/category/ECCL00000043/",
+    "deadline": "2026-07-20T23:59:00+09:00",
+    "start_at": "2026-07-18T17:00:00+09:00",
+    "conditions": [
+      "当選者は店頭販売",
+      "WEB抽選受付"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544590658015354"
+  },
+  {
+    "id": "88b15b7346ad51a2a61c",
+    "title": "ONE PIECEカードゲーム ONE PIECE Heroines Edition EB-03、受け継がれる意志 抽選販売",
+    "category": "onepiece",
+    "store": "DMM通販",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://al.dmm.com/?lurl=https%3A%2F%2Fwww.dmm.com%2Fmono%2Fhobby%2F-%2Flist%2F%3D%2Farticle%3Dkeyword%2Fid%3D308378%2F&af_id=nnow-001&ch=link_tool&ch_id=link",
+    "deadline": "2026-07-21T15:00:00+09:00",
+    "start_at": "2026-07-14T15:00:00+09:00",
+    "conditions": [
+      "WEB抽選受付",
+      "当選者はオンライン販売"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544594130636994"
+  },
+  {
+    "id": "302e9bee0c9a1c87d2be",
+    "title": "ポケモンカード ストームエメラルダ WEB抽選（トレカプラザ55通販）",
+    "category": "pokemon",
+    "store": "トレカプラザ55通販",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSeEC_Ey8L52XY_c1h3NwKGuIUY0YppPiHDP_mmKvhlhkVQMyg/viewform",
+    "deadline": "2026-07-21T23:59:00+09:00",
+    "start_at": "2026-07-09T11:00:00+09:00",
+    "conditions": [],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544597381222591"
+  },
+  {
+    "id": "e01112e282d8d0806a62",
+    "title": "ポケモンカード ストームエメラルダ WEB抽選（キデイランド各店）",
+    "category": "pokemon",
+    "store": "キデイランド各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/p/hpmzs",
+    "deadline": "2026-07-22T23:59:00+09:00",
+    "start_at": "2026-07-20T10:00:00+09:00",
+    "conditions": [],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544600329949195"
+  },
+  {
+    "id": "5214ac0b839b32bc8d60",
+    "title": "ポケモンカード ストームエメラルダ・スターターセットex各種 店頭抽選（イエローサブマリン各店）",
+    "category": "pokemon",
+    "store": "イエローサブマリン各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://x.com/YS_INFO/",
+    "deadline": "2026-07-26T20:00:00+09:00",
+    "start_at": "2026-07-15T10:00:00+09:00",
+    "conditions": [
+      "各店掲示のポスターより申込みページへ",
+      "指定期間内の最低購入金額300円以上のレシートが必要"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544602825687321"
+  },
+  {
+    "id": "280ca7b647c5c75428b3",
+    "title": "ポケモンカード ストームエメラルダ・スターターセットex各種 店頭抽選（ドラゴンスター各店）",
+    "category": "pokemon",
+    "store": "ドラゴンスター各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://dorasuta.membercard.jp/lottery",
+    "deadline": "2026-07-26T23:59:00+09:00",
+    "start_at": "2026-07-14T22:30:00+09:00",
+    "conditions": [],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1528544605383950367"
+  }
+]
