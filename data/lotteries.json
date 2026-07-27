@@ -1,1 +1,71 @@
-[]
+[
+  {
+    "id": "45690877f18c827f84a5",
+    "title": "ポケモンカード メガブレイブ・メガシンフォニア WEB抽選販売",
+    "category": "pokemon",
+    "store": "フルコンプ 一部店舗",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/e/im27p",
+    "deadline": "2026-08-02T12:00:00+09:00",
+    "start_at": "2026-07-27T16:00:00+09:00",
+    "conditions": [
+      "LivePocket会員登録",
+      "プレイヤーID（0を含む10桁の数字）",
+      "1人1回・1店舗のみ応募可能",
+      "受取時に当選チケット（QRコード）と公的身分証明書提示",
+      "当選者本人のみ応募店舗にて購入可能",
+      "スクリーンショット・画像・コピーによる提示は無効"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531444831593955350"
+  },
+  {
+    "id": "7867cb1660555c6fb978",
+    "title": "ポケモンカード ストームエメラルダ・ブラックボルト・ホワイトフレア WEB抽選販売",
+    "category": "pokemon",
+    "store": "ゲオ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://geo-online.co.jp/news/774",
+    "deadline": "2026-08-06T17:59:00+09:00",
+    "start_at": "2026-08-03T11:00:00+09:00",
+    "conditions": [
+      "店舗レンタル会員機能付きPontaカードとゲオアプリ・Ponta会員ID連携済",
+      "当選後購入時に本人確認書類と店舗レンタル会員機能付き会員証提示"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認",
+      "本人確認を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531444834341093491"
+  },
+  {
+    "id": "7e1aa6e9be198ecdcce5",
+    "title": "ONE PIECEカードゲーム ブースターパック 決戦の刻【OP-16】 WEB抽選受付",
+    "category": "onepiece",
+    "store": "ミニストップオンライン",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://online.ministop.co.jp/Page/onepiece.aspx",
+    "deadline": "2026-08-17T15:00:00+09:00",
+    "start_at": null,
+    "conditions": [],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": "1531444836996087881"
+  }
+]
