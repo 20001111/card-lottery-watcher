@@ -1,1 +1,124 @@
-[]
+[
+  {
+    "id": "9e4df7705438bea50216",
+    "title": "ポケモンカード ストームエメラルダ 抽選（ホビーステーション）",
+    "category": "pokemon",
+    "store": "ホビーステーション",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/e/pd1sq",
+    "deadline": "2026-07-30T23:59:00+09:00",
+    "start_at": "2026-07-28T12:00:00+09:00",
+    "conditions": [
+      "Livepocket会員登録"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531806294934159441"
+  },
+  {
+    "id": "362b9a3b4c18529c8a6a",
+    "title": "ポケモンカード スタートデッキ100 バトルコレクション 抽選（ホビーステーション）",
+    "category": "pokemon",
+    "store": "ホビーステーション",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/e/2ok_r",
+    "deadline": "2026-07-30T23:59:00+09:00",
+    "start_at": "2026-07-28T12:00:00+09:00",
+    "conditions": [
+      "Livepocket会員登録"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531806297299615826"
+  },
+  {
+    "id": "8686e826315b0d9dc914",
+    "title": "ポケモンカード メガブレイブ・メガシンフォニア 抽選（フルコンプ 一部店舗）",
+    "category": "pokemon",
+    "store": "フルコンプ 一部店舗",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/e/im27p",
+    "deadline": "2026-08-02T12:00:00+09:00",
+    "start_at": "2026-07-27T16:00:00+09:00",
+    "conditions": [
+      "LivePocket会員登録",
+      "プレイヤーID（0を含む10桁の数字）",
+      "1人1回・1店舗のみ応募可能",
+      "受取時に当選チケット（QRコード）と公的身分証明書提示",
+      "当選者本人のみ店舗購入"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531806299669663835"
+  },
+  {
+    "id": "6215d299bedac8b7ba5a",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選受付",
+    "category": "onepiece",
+    "store": "プレミアムバンダイ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://p-bandai.jp/item/item-1000255170/",
+    "deadline": "2026-08-04T23:00:00+09:00",
+    "start_at": "2026-07-29T11:00:00+09:00",
+    "conditions": [
+      "抽選販売（先着順ではありません）",
+      "おひとり様1個まで",
+      "決済方法：クレジットカード前払い／プレバンPay（応募時払い）／ペイディ",
+      "クーポン・プレミアムポイント使用不可",
+      "商品不良時を除き返品不可",
+      "会員登録（無料）が必要"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認",
+      "クレジットカードを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531806301926068456"
+  },
+  {
+    "id": "798b94e054f5b6d9206a",
+    "title": "ポケモンカード ストームエメラルダ・ブラックボルト・ホワイトフレア 抽選（ゲオ）",
+    "category": "pokemon",
+    "store": "ゲオ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://geo-online.co.jp/news/774",
+    "deadline": "2026-08-06T17:59:00+09:00",
+    "start_at": "2026-08-03T11:00:00+09:00",
+    "conditions": [
+      "店舗レンタル会員機能付きPontaカードとゲオアプリ連携済み",
+      "当選後本人確認書類と店舗レンタル会員機能付き会員証提示"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認",
+      "本人確認を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": "1531806304937705694"
+  }
+]
