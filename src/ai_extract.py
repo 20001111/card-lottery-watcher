@@ -75,7 +75,12 @@ the evidence states the dates and application conditions you found.
 """
     response = requests.post(
         API_URL,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        headers={
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2026-03-10",
+        },
         json={
             "model": config.get("ai_model", "openai/gpt-4.1"),
             "temperature": 0,
