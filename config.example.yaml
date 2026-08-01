@@ -6,6 +6,14 @@ ai_model: openai/gpt-4.1
 minimum_ai_confidence: 0.75
 max_deadline_days: 45
 
+# X is optional. When enabled, the official API makes exactly one search request
+# per workflow run and retrieves at most 10 posts. Every linked page still goes
+# through the same AI validation as the normal sources.
+x_discovery:
+  enabled: false
+  max_posts: 10
+  query: '"ポケカ" (抽選 OR 応募) has:links lang:ja -is:retweet -is:reply'
+
 preferences:
   base_station: 水道橋
   max_travel_minutes: 90

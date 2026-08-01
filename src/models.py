@@ -1,5 +1,16 @@
 from dataclasses import asdict, dataclass, field
+import hashlib
 from typing import Optional
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+
+def lottery_identity(store: str, title: str, application_url: str, deadline: Optional[str] = None) -> str:
+    """Produce a stable ID across reposts and tracking-link variants."""
+    parsed = urlsplit(application_url)
+    query = urlencode(sorted((key, value) for key, value in parse_qsl(parsed.query) if not key.lower().startswith(("utm_", "fbclid", "gclid"))))
+    canonical_url = urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/"), query, ""))
+    text = "|".join((" ".join(store.lower().split()), " ".join(title.lower().split()), canonical_url, (deadline or "")[:10]))
+    return hashlib.sha256(text.encode()).hexdigest()[:20]
 
 
 @dataclass
