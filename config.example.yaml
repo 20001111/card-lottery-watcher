@@ -13,6 +13,18 @@ x_discovery:
   enabled: false
   max_posts: 10
   query: '"ポケカ" (抽選 OR 応募) has:links lang:ja -is:retweet -is:reply'
+  # These accounts are prioritized as leads, not trusted as proof. Their linked
+  # pages must still contain a valid, future deadline before notification.
+  priority_accounts:
+    - PokeGetInfoMain
+    - Meisy_TCG_News
+    - mirar_times
+    - omusubicororiin
+    - shiryuu8
+    - pokecayoyaku
+  priority_minimum_ai_confidence: 0.75
+  other_minimum_ai_confidence: 0.88
+  require_official_confirmation: true
 
 preferences:
   base_station: 水道橋

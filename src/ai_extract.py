@@ -37,6 +37,7 @@ def extract_with_ai(source: dict, document: str, allowed_links: set[str], now: d
     if not token:
         raise RuntimeError("GITHUB_TOKEN is required for AI extraction")
     max_days = int(config.get("max_deadline_days", 45))
+    minimum_confidence = float(source.get("minimum_ai_confidence", config.get("minimum_ai_confidence", 0.75)))
     system = """あなたは日本のトレーディングカード抽選情報の検証担当です。
 ページ本文に明記された事実だけを使います。商品紹介、発売予定だけ、終了済み、予約ではない通常販売、大会情報は除外してください。
 現在応募受付中、または開始日時が明記された近日開始の抽選だけを抽出します。
@@ -64,6 +65,14 @@ JSON以外は出力しないでください。"""
 
 ページ内容:
 {document}"""
+    user += """
+
+For every result, inspect the linked page itself. Set official_confirmed to true only
+when it is an official brand, store, or authorised retailer's actual application
+page. Do not treat an X post, a news article, or an aggregation page as official.
+Only include a result when the page states a real future application deadline and
+the evidence states the dates and application conditions you found.
+"""
     response = requests.post(
         API_URL,
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
@@ -90,8 +99,11 @@ JSON以外は出力しないでください。"""
             continue
         if item.get("card_type") not in ("pokemon", "onepiece"):
             continue
-        if float(item.get("confidence", 0)) < float(config.get("minimum_ai_confidence", 0.75)):
+        if source.get("require_official_confirmation") and item.get("official_confirmed") is not True:
+            continue
+        if source.get("require_official_confirmation") and not item.get("evidence"):
+            continue
+        if float(item.get("confidence", 0)) < minimum_confidence:
             continue
         valid.append(item)
     return valid
-

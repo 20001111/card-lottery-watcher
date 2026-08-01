@@ -61,7 +61,7 @@ def main():
                     start_at=raw.get("start_at"),
                     conditions=conditions,
                     source_kind=source.get("kind", "discovery"),
-                    official_confirmed=source.get("kind") == "official",
+                    official_confirmed=source.get("kind") == "official" or bool(raw.get("official_confirmed")),
                 )
                 collected[item.id] = evaluate(item, config.get("eligibility", {}))
         except Exception as exc:
