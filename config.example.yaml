@@ -5,6 +5,9 @@ request_timeout_seconds: 20
 ai_model: gpt-5-mini
 minimum_ai_confidence: 0.75
 max_deadline_days: 45
+# Official announcement pages are followed only for the first matching details.
+# This keeps costs and requests small while allowing dates and conditions to be verified.
+official_detail_link_limit: 2
 
 # X is optional. When enabled, the official API makes exactly one search request
 # per workflow run and retrieves at most 10 posts. Every linked page still goes
@@ -54,6 +57,16 @@ sources:
     kind: official
     category: pokemon
     url: https://www.pokemoncenter-online.com/news/
+  - name: ポケモンセンター公式店舗
+    store_key: pokemon_center_store
+    kind: official
+    category: pokemon
+    url: https://shop.pokemon.co.jp/ja/shop/common/news/
+  - name: ゲオ公式お知らせ
+    store_key: geo
+    kind: official
+    category: both
+    url: https://geo-online.co.jp/news/
   - name: ONE PIECEカード公式TOPICS
     store_key: onepiece_official
     kind: official
