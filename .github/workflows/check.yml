@@ -13,8 +13,8 @@ jobs:
       contents: write
       models: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -24,7 +24,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
-          CALENDAR_URL: ${{ secrets.CALENDAR_URL }}
+          CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
         run: python -m src.main
       - name: Save state
         run: |

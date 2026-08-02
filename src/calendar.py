@@ -19,6 +19,18 @@ def _deadline(item: dict, timezone: str):
         return None
 
 
+def _date_label(value: str | None, timezone: str) -> str:
+    if not value:
+        return "開始日時の記載なし"
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is not None:
+            parsed = parsed.astimezone(ZoneInfo(timezone))
+        return f"開始 {parsed:%m/%d %H:%M}"
+    except ValueError:
+        return f"開始 {value}"
+
+
 def build_calendar(items: list[dict], destination: Path, timezone: str = "Asia/Tokyo"):
     """Write a self-contained index page and its JSON data for GitHub Pages."""
     destination.mkdir(parents=True, exist_ok=True)
@@ -40,6 +52,7 @@ def build_calendar(items: list[dict], destination: Path, timezone: str = "Asia/T
                 f'<span class="time">{deadline:%H:%M}まで</span>'
                 f'<strong>{escape(item.get("title", "抽選"))}</strong>'
                 f'<span>{escape(item.get("store", ""))}</span>'
+                f'<span>{escape(_date_label(item.get("start_at"), timezone))}</span>'
                 '</a>'
             )
         day = datetime.fromisoformat(date_key).strftime("%m/%d")

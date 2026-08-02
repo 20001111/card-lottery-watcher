@@ -83,14 +83,14 @@ def main():
     digest = [x for x in items if x.eligibility != "ineligible"]
     heading = f"📅 本日のカード抽選（締切順） {now:%Y/%m/%d}"
     calendar_url = os.getenv("CALENDAR_URL")
-    if calendar_url:
-        heading += f"\n📅 カレンダー: {calendar_url}"
     send_heading(webhook, heading)
     for item in digest[:25]:
         try:
             item.discord_message_id = send_or_update(webhook, item)
         except Exception as exc:
             print(f"WARN Discord {item.title}: {exc}")
+    if calendar_url:
+        send_heading(webhook, f"📅 締切カレンダー: {calendar_url}")
 
 
 if __name__ == "__main__":

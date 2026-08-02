@@ -8,6 +8,7 @@ LABELS = {"eligible": "🟢 応募可能", "check": "🟡 条件を要確認", "
 
 def _payload(item):
     deadline = item.deadline or "締切不明"
+    start_at = item.start_at or "記載なし（受付中か要確認）"
     conditions = "、".join(item.conditions) or "記載なし"
     reasons = "\n".join(f"・{x}" for x in item.eligibility_reasons) or "・追加確認事項なし"
     return {
@@ -16,7 +17,7 @@ def _payload(item):
             "title": item.title[:256],
             "url": item.application_url,
             "color": COLORS[item.eligibility],
-            "description": f"**{LABELS[item.eligibility]}**\n締切：{deadline}\n条件：{conditions}\n{reasons}",
+            "description": f"**{LABELS[item.eligibility]}**\n開始：{start_at}\n締切：{deadline}\n条件：{conditions}\n{reasons}",
             "footer": {"text": f"情報元: {item.store} | {'公式確認済み' if item.official_confirmed else '未確認情報'}"},
         }],
     }
