@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 
-API_URL = "https://models.github.ai/inference/chat/completions"
+API_URL = "https://api.openai.com/v1/chat/completions"
 
 
 def page_document(html: str, page_url: str, max_chars: int = 30000):
@@ -33,9 +33,9 @@ def _json_content(content: str):
 
 
 def extract_with_ai(source: dict, document: str, allowed_links: set[str], now: datetime, config: dict):
-    token = os.getenv("GITHUB_TOKEN")
+    token = os.getenv("OPENAI_API_KEY")
     if not token:
-        raise RuntimeError("GITHUB_TOKEN is required for AI extraction")
+        raise RuntimeError("OPENAI_API_KEY is required for AI extraction")
     max_days = int(config.get("max_deadline_days", 45))
     minimum_confidence = float(source.get("minimum_ai_confidence", config.get("minimum_ai_confidence", 0.75)))
     system = """あなたは日本のトレーディングカード抽選情報の検証担当です。
@@ -76,13 +76,11 @@ the evidence states the dates and application conditions you found.
     response = requests.post(
         API_URL,
         headers={
-            "Accept": "application/vnd.github+json",
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
-            "X-GitHub-Api-Version": "2026-03-10",
         },
         json={
-            "model": config.get("ai_model", "openai/gpt-4.1"),
+            "model": config.get("ai_model", "gpt-5-mini"),
             "temperature": 0,
             "response_format": {"type": "json_object"},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],

@@ -22,7 +22,7 @@ jobs:
       - name: Collect and notify
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           CALENDAR_URL: ${{ secrets.CALENDAR_URL }}
         run: python -m src.main

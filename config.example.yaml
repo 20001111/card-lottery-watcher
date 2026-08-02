@@ -2,7 +2,7 @@ timezone: Asia/Tokyo
 digest_hour: 7
 digest_minute: 30
 request_timeout_seconds: 20
-ai_model: openai/gpt-4.1
+ai_model: gpt-5-mini
 minimum_ai_confidence: 0.75
 max_deadline_days: 45
 
