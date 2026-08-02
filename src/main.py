@@ -107,6 +107,20 @@ def main():
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")
 
+    # A temporary source or AI outage must not erase still-open lotteries from
+    # the calendar. Freshly verified entries replace their previous version.
+    for item_id, previous in old.items():
+        if item_id in collected:
+            continue
+        try:
+            previous_deadline = datetime.fromisoformat(previous.get("deadline", "").replace("Z", "+00:00"))
+            if previous_deadline.tzinfo is None:
+                previous_deadline = previous_deadline.replace(tzinfo=now.tzinfo)
+            if previous_deadline > now:
+                collected[item_id] = Lottery(**previous)
+        except (TypeError, ValueError):
+            continue
+
     for item in collected.values():
         item.discord_message_id = old.get(item.id, {}).get("discord_message_id")
     items = list(collected.values())
