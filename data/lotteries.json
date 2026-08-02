@@ -1,1 +1,139 @@
-[]
+[
+  {
+    "id": "9cca3d940ce6c1c262cc",
+    "title": "ポケモンカード 各種（アビスアイ・ニンジャスピナー・ストームエメラルダ 等） 抽選 - 平和堂",
+    "category": "pokemon",
+    "store": "平和堂",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.heiwado.jp/service/hopapp",
+    "deadline": "2026-08-02T23:59:00+09:00",
+    "start_at": "2026-08-01T10:00:00+09:00",
+    "conditions": [
+      "アプリ抽選受付（HopAppによる抽選）",
+      "当選者は店頭で購入"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "5e0fa72dd5690e26bc64",
+    "title": "ポケモンカード メガブレイブ・メガシンフォニア 抽選 - ホビーステーション",
+    "category": "pokemon",
+    "store": "ホビーステーション",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://livepocket.jp/e/kj91d",
+    "deadline": "2026-08-02T23:59:00+09:00",
+    "start_at": "2026-07-31T12:00:00+09:00",
+    "conditions": [
+      "申し込みにLivepocket会員登録が必要",
+      "当選者は各1BOXまで購入（店頭販売）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "d67c4775e50b146de4f7",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（プレミアムバンダイ）",
+    "category": "onepiece",
+    "store": "プレミアムバンダイ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://p-bandai.jp/item/item-1000255170/",
+    "deadline": "2026-08-04T23:00:00+09:00",
+    "start_at": "2026-07-29T11:00:00+09:00",
+    "conditions": [
+      "会員登録（無料）が必要",
+      "お申し込みはおひとり様1個まで",
+      "決済方法：クレジットカード前払い／プレバンPay／ペイディのみ",
+      "クーポン・プレミアムポイント使用不可／商品不良時を除き返品不可"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "会員登録を要確認",
+      "クレジットカードを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "ba734b523be41eac80e2",
+    "title": "ポケモンカード ストームエメラルダ・ブラックボルト・ホワイトフレア 抽選 - ゲオ",
+    "category": "pokemon",
+    "store": "ゲオ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://geo-online.co.jp/news/774",
+    "deadline": "2026-08-06T17:59:00+09:00",
+    "start_at": "2026-08-03T11:00:00+09:00",
+    "conditions": [
+      "Pontaカード（店舗レンタル会員機能）を所持しゲオアプリとPonta会員IDを連携済みであること",
+      "当選後購入時に本人確認書類と店舗レンタル会員機能付き会員証（Pontaカードまたはゲオアプリ会員証）提示が必要"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認",
+      "本人確認を要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "aa86f7f724f990fb85b4",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（あみあみ）",
+    "category": "onepiece",
+    "store": "あみあみ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://form.amiami.jp/draw20260730",
+    "deadline": "2026-08-04T13:59:00+09:00",
+    "start_at": "2026-07-30T10:00:00+09:00",
+    "conditions": [
+      "あみあみメールマガジン購読（無料）を設定していることが優先",
+      "amiami.jpで購入した商品を特定期間内に受け取っていることが優先"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "a3d341421b020625aaef",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（トレカプラザ55通販）",
+    "category": "onepiece",
+    "store": "トレカプラザ55通販",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSffABPUyiR62_4WCWrJJs3GI7JPee7B9sC8Eh3qqCR9nSo1YA/viewform",
+    "deadline": "2026-08-11T23:59:00+09:00",
+    "start_at": "2026-07-31T20:00:00+09:00",
+    "conditions": [
+      "WEB抽選受付（当選者にはオンライン販売）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  }
+]
