@@ -81,13 +81,17 @@ the evidence states the dates and application conditions you found.
         },
         json={
             "model": config.get("ai_model", "gpt-5-mini"),
-            "temperature": 0,
             "response_format": {"type": "json_object"},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         },
         timeout=90,
     )
-    response.raise_for_status()
+    if not response.ok:
+        # Include the provider's safe error message in Actions logs. This makes
+        # configuration problems diagnosable without exposing the API key.
+        raise RuntimeError(
+            f"OpenAI request failed ({response.status_code}): {response.text[:500]}"
+        )
     data = _json_content(response.json()["choices"][0]["message"]["content"])
     valid = []
     for item in data.get("lotteries", []):
