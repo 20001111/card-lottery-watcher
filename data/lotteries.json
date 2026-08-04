@@ -1,79 +1,24 @@
 [
   {
-    "id": "97b283b68349ef14bc18",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選販売（プレミアムバンダイ）",
-    "category": "onepiece",
-    "store": "プレミアムバンダイ",
+    "id": "defb6d9e07fb12c5fe65",
+    "title": "ポケモンカード（ストームエメラルダ / ブラックボルト / ホワイトフレア） 抽選",
+    "category": "pokemon",
+    "store": "ゲオ",
     "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://p-bandai.jp/item/item-1000255170/",
-    "deadline": "2026-08-04T23:00:00+09:00",
-    "start_at": "2026-07-29T11:00:00+09:00",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://geo-online.co.jp/news/774",
+    "deadline": "2026-08-06T17:59:00+09:00",
+    "start_at": "2026-08-03T11:00:00+09:00",
     "conditions": [
-      "会員登録（無料）必要",
-      "お申し込みはおひとり様1個まで",
-      "決済：クレジットカード前払い／プレバンPay／ペイディ（応募時払い）",
-      "クーポン・プレミアムポイント使用不可／商品不良時を除き返品不可"
+      "店舗レンタル会員機能を追加したPontaカードを保有しゲオアプリとPonta会員ID連携済みであること",
+      "当選後購入時に公的身分証と店舗レンタル会員機能付き会員証を提示できること（本人確認が必要）"
     ],
     "source_kind": "discovery",
     "official_confirmed": false,
     "eligibility": "check",
     "eligibility_reasons": [
-      "会員登録を要確認",
-      "クレジットカードを要確認"
-    ],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "d67c4775e50b146de4f7",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（プレミアムバンダイ）",
-    "category": "onepiece",
-    "store": "プレミアムバンダイ",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://p-bandai.jp/item/item-1000255170/",
-    "deadline": "2026-08-04T23:00:00+09:00",
-    "start_at": "2026-07-29T11:00:00+09:00",
-    "conditions": [
-      "申込はおひとり様1個まで",
-      "決済：クレジットカード前払い／プレバンPay（応募時払い）／ペイディ のいずれか",
-      "会員登録（無料）が必要",
-      "クーポン・プレミアムポイント使用不可／返品不可（不良品除く）"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "会員登録を要確認",
-      "クレジットカードを要確認"
-    ],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "d14edee80acb0e07ecfd",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選（プレミアムバンダイ）",
-    "category": "onepiece",
-    "store": "プレミアムバンダイ",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://p-bandai.jp/item/item-1000255170/",
-    "deadline": "2026-08-04T23:00:00+09:00",
-    "start_at": "2026-07-29T11:00:00+09:00",
-    "conditions": [
-      "お申し込みはおひとり様1個まで",
-      "決済：クレジットカード前払い／プレバンPay（応募時払い）／ペイディ",
-      "クーポンおよびプレミアムポイント使用不可",
-      "返品不可（商品不良時を除く）",
-      "会員登録（無料）必要"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "会員登録を要確認",
-      "クレジットカードを要確認"
+      "アプリを要確認",
+      "本人確認を要確認"
     ],
     "status": "open",
     "discord_message_id": null
@@ -221,95 +166,19 @@
     "discord_message_id": null
   },
   {
-    "id": "abd3905427cc93a475d9",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選（あみあみ）",
+    "id": "dd4cc5c9ee11a45feb85",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（イオンスタイルオンライン）",
     "category": "onepiece",
-    "store": "あみあみ",
+    "store": "イオンスタイルオンライン",
     "store_key": "nyuka_now",
     "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://form.amiami.jp/draw20260730",
-    "deadline": "2026-08-04T13:59:00+09:00",
-    "start_at": "2026-07-30T10:00:00+09:00",
+    "application_url": "https://aeonretail.com/Page/k-lottery_sale_02.aspx",
+    "deadline": "2026-08-05T23:59:00+09:00",
+    "start_at": "2026-08-04T11:00:00+09:00",
     "conditions": [
-      "以下を満たす方を優先：あみあみメールマガジン購読、amiami.jpでの購入受取履歴（優先条件）"
+      "イオンカード会員限定",
+      "イオンスタイルオンライン会員限定"
     ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "aa86f7f724f990fb85b4",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 抽選（あみあみ）",
-    "category": "onepiece",
-    "store": "あみあみ",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://form.amiami.jp/draw20260730",
-    "deadline": "2026-08-04T13:59:00+09:00",
-    "start_at": "2026-07-30T10:00:00+09:00",
-    "conditions": [
-      "あみあみメールマガジン購読（無料）を設定が優先条件",
-      "過去期間にamiami.jpで購入・受取履歴があることが優先条件"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "b5d01ec200717fff820e",
-    "title": "トレカプラザ55通販 抽選：ポケモンカード ストームエメラルダ・スターターセットex各種",
-    "category": "pokemon",
-    "store": "トレカプラザ55通販",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSdd4y0UV63q1X_KxjD2-Drf0UFGnd1an-NaANP6ewoFOuLykg/viewform",
-    "deadline": "2026-08-04T23:59:00+09:00",
-    "start_at": "2026-07-31T20:00:00+09:00",
-    "conditions": [],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "621cc16d27a41b2c578c",
-    "title": "ポケモンカード ストームエメラルダ・スターターセットex等 抽選（トレカプラザ55通販）",
-    "category": "pokemon",
-    "store": "トレカプラザ55通販",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSdd4y0UV63q1X_KxjD2-Drf0UFGnd1an-NaANP6ewoFOuLykg/viewform",
-    "deadline": "2026-08-04T23:59:00+09:00",
-    "start_at": "2026-07-31T20:00:00+09:00",
-    "conditions": [
-      "WEB抽選受付（当選者はオンライン販売）"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "1ddb242df443eecf58f8",
-    "title": "ポケモンカード ストームエメラルダ等 抽選（トレカプラザ55通販）",
-    "category": "pokemon",
-    "store": "トレカプラザ55通販",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSdd4y0UV63q1X_KxjD2-Drf0UFGnd1an-NaANP6ewoFOuLykg/viewform",
-    "deadline": "2026-08-04T23:59:00+09:00",
-    "start_at": "2026-07-31T20:00:00+09:00",
-    "conditions": [],
     "source_kind": "discovery",
     "official_confirmed": false,
     "eligibility": "unknown",
@@ -327,9 +196,7 @@
     "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSffABPUyiR62_4WCWrJJs3GI7JPee7B9sC8Eh3qqCR9nSo1YA/viewform",
     "deadline": "2026-08-11T23:59:00+09:00",
     "start_at": "2026-07-31T20:00:00+09:00",
-    "conditions": [
-      "当選者はオンライン販売で購入（ページにその他条件記載なし）"
-    ],
+    "conditions": [],
     "source_kind": "discovery",
     "official_confirmed": false,
     "eligibility": "unknown",
