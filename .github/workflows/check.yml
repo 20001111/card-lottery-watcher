@@ -5,13 +5,21 @@ on:
     - cron: "30 7 * * *"
       timezone: "Asia/Tokyo"
   workflow_dispatch:
+    inputs:
+      notification_target:
+        description: "通知先（開発用で検証してから本番へ）"
+        required: true
+        default: development
+        type: choice
+        options:
+          - development
+          - production
 
 jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      models: read
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -21,7 +29,10 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Collect and notify
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # Scheduled runs always use the production channel. Manual runs
+          # default to the private development channel unless explicitly set
+          # to production from the Run workflow menu.
+          DISCORD_WEBHOOK_URL: ${{ (github.event_name == 'schedule' || inputs.notification_target == 'production') && secrets.DISCORD_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_DEV_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
