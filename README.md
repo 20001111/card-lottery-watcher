@@ -1,70 +1,76 @@
-# カード抽選Discord通知
+# カード抽選ウォッチャー
 
-ポケモンカード／ONE PIECEカードの抽選情報を収集し、応募資格を判定してDiscordへ締切順に通知します。自動応募は行いません。
+ポケモンカード・ONE PIECEカードの抽選情報を収集し、確認できた情報をWebサイトへ掲載する個人運用のツールです。
 
-## 特徴
+## できること
 
-- 公式ページ、カードショップ、抽選まとめサイトを設定ファイルで追加可能
-- 購入履歴、会員登録、アプリ、本人確認などを抽出
-- 「応募可能／要確認／条件外／公式確認待ち」に分類
-- 毎朝7:30の締切順ダイジェスト
-- 抽選ごとの個別投稿と、Discordの✅リアクションによる応募済み管理
-- GitHub Modelsによる抽選判定（商品説明・終了済み情報・不正確な日付を除外）
-- 注文番号などの個人情報は保存しない
+- 公式のお知らせページと登録した情報源から抽選候補を収集
+- AIで応募先、店舗、開始日、締切、条件を確認
+- 開始日と締切の両方を確認できたものだけをWebサイトのカレンダーへ掲載
+- 日付が不足する候補は「確認待ち」として分離
+- Discordには**新しく見つけた抽選だけ**を通知
+- 同じ抽選の再取得や締切修正ではDiscordへ再通知しない
 
-## セットアップ
+## WebサイトとDiscordの役割
 
-1. このフォルダーをGitHubの非公開リポジトリへ登録します。
-2. `config.example.yaml`を`config.yaml`としてコピーします。
-3. `config.yaml`の`eligibility`を自分の状況に合わせます。分からない項目は`null`にします。
-4. Discordで通知用チャンネルを作り、チャンネル設定の「連携サービス」からWebhookを作成します。
-5. GitHubの `Settings > Secrets and variables > Actions` に、`DISCORD_WEBHOOK_URL`という名前でWebhook URLを登録します。
-6. GitHubのActions画面で`Card lottery watcher`を手動実行します。
+| 場所 | 役割 |
+| --- | --- |
+| Webサイト | 抽選の一覧、受付期間、店舗、条件、応募リンクを確認する本体 |
+| Discord通知 | 新しい抽選が見つかったことだけを知らせる入口 |
+| 確認待ちページ | 開始日または締切が不足していて、掲載前に確認が必要な候補 |
 
-## 応募済みの管理
+## 現在の情報源
 
-応募が終わったら、その抽選のDiscord投稿に✅リアクションを付けます。次回は同じ投稿を更新するため、✅が残り、スマホとPCで同じ状態を確認できます。
+- ポケモンセンターオンライン
+- ポケモンセンター店舗公式のお知らせ
+- ポケモンカード公式ニュース
+- ゲオ公式のお知らせ
+- ONE PIECEカードゲーム公式TOPICS
+- 補助的な抽選情報サイト
+- X APIによる候補発見（任意。リンク先の確認ができたものだけ採用）
 
-## 監視先の追加
+## GitHubで必要な設定
 
-`config.yaml`の`sources`へ追加します。
+`Settings` → `Secrets and variables` → `Actions` で、次のSecretsを設定します。
 
-```yaml
-- name: カードボックス○○店
-  store_key: cardbox
-  kind: official
-  category: both
-  url: https://example.com/lottery
-```
+| Secret | 用途 |
+| --- | --- |
+| `OPENAI_API_KEY` | 抽選ページの確認に使うOpenAI APIキー |
+| `DISCORD_WEBHOOK_URL` | 本番の新規抽選通知先Webhook |
+| `X_BEARER_TOKEN` | Xから候補を探す場合のみ必要 |
+| `CALENDAR_URL` | 公開カレンダーのURL |
 
-`kind: discovery`は発見用サイト、`kind: official`は店舗公式ページです。まとめサイトの情報は公式確認待ちとして表示されます。
+Webhook URLやAPIキーは、コード・設定ファイル・チャットには書かないでください。
 
-## ローカルテスト
+## 実行方法
+
+GitHubの `Actions` からワークフローを手動実行できます。通常の自動実行では情報を収集し、Webサイトを更新します。
+
+開発用のWebhookを追加した後は、手動実行を開発用チャンネルへ、本番の定期実行を本番チャンネルへ分けます。
+
+## 情報提供と承認
+
+外部から提供された情報は、そのまま公開しません。
+
+1. 情報提供として候補を受け取る
+2. 応募先のリンク、店舗、日付を確認する
+3. 承認されたものだけをWebサイトへ掲載する
+
+承認ボタン付きのDiscordボットは今後追加予定です。
+
+## ローカル実行
 
 ```bash
-cp config.example.yaml config.yaml
+copy config.example.yaml config.yaml
 python -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt pytest
-pytest -q
+.venv\Scripts\activate
+pip install -r requirements.txt
 python -m src.main
 ```
 
-Webhookが未設定なら収集だけ行い、Discordには送信しません。
+## 運用上の方針
 
-## AI判定
-
-GitHub Actionsの`GITHUB_TOKEN`でGitHub Modelsを呼び出します。追加のAPIキー登録は不要です。ワークフローには`models: read`権限が必要です。AIがページ本文から受付中または近日開始の抽選だけを抽出し、その後コード側でも次を検証します。
-
-- 応募締切が本文にある
-- 締切が過去ではない
-- 締切が45日以内
-- 応募URLが実際にページ内に存在する
-- 信頼度が0.75以上
-
-## 注意
-
-- 各サイトの利用規約とrobots.txtに従ってください。
-- HTML変更によって抽出できなくなることがあります。
-- 応募条件と締切は必ず公式応募ページでも確認してください。
-- Webhook URLをコードや`config.yaml`へ直接書かないでください。
+- 公式ページまたは応募先を優先して確認する
+- ページ本文の転載ではなく、必要な要約と元ページへのリンクを掲載する
+- 誤情報や日付不足の候補は、承認前には公開しない
+- 情報源ごとの利用条件とrobots.txtを尊重する
