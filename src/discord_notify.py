@@ -39,3 +39,28 @@ def send_or_update(webhook_url: str, item):
     response.raise_for_status()
     time.sleep(0.4)
     return response.json()["id"]
+
+
+def send_new(webhook_url: str, item, calendar_url: str | None = None):
+    """Post one compact alert for a newly discovered lottery only."""
+    destination = calendar_url or item.application_url
+    start_at = item.start_at or "-"
+    deadline = item.deadline or "-"
+    payload = {
+        "content": "\U0001f195 \u65b0\u3057\u3044\u62bd\u9078\u60c5\u5831",
+        "embeds": [{
+            "title": item.title[:256],
+            "url": destination,
+            "color": 0x2563EB,
+            "description": (
+                f"**\u5e97\u8217**\uff1a{item.store}\n"
+                f"**\u53d7\u4ed8\u671f\u9593**\uff1a{start_at} \u301c {deadline}\n"
+                "\u8a73\u7d30\u306fWeb\u30b5\u30a4\u30c8\u3067\u78ba\u8a8d\u3067\u304d\u307e\u3059\u3002"
+            ),
+            "footer": {"text": "\u30ab\u30fc\u30c9\u62bd\u9078\u901a\u77e5"},
+        }],
+    }
+    response = requests.post(webhook_url, params={"wait": "true"}, json=payload, timeout=20)
+    response.raise_for_status()
+    time.sleep(0.4)
+    return response.json()["id"]

@@ -13,6 +13,15 @@ def lottery_identity(store: str, title: str, application_url: str, deadline: Opt
     return hashlib.sha256(text.encode()).hexdigest()[:20]
 
 
+def notification_identity(store: str, title: str, application_url: str) -> str:
+    """Stable identity used only to prevent repeat Discord notifications.
+
+    A deadline correction must update the website without looking like a new
+    lottery announcement.
+    """
+    return lottery_identity(store, title, application_url)
+
+
 @dataclass
 class Lottery:
     id: str

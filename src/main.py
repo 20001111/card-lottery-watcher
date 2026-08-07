@@ -11,9 +11,9 @@ from bs4 import BeautifulSoup
 
 from .ai_extract import extract_with_ai, page_document
 from .calendar import build_calendar
-from .discord_notify import send_heading, send_or_update
+from .discord_notify import send_new
 from .eligibility import evaluate
-from .models import Lottery, lottery_identity
+from .models import Lottery, lottery_identity, notification_identity
 from .x_discovery import candidate_sources
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +27,13 @@ def official_detail_urls(html: str, page_url: str, source: dict, limit: int) -> 
         "onepiece": ("one piece", "ワンピース", "ワンピ"),
         "both": ("ポケモン", "ポケカ", "one piece", "ワンピース", "ワンピ"),
     }.get(source.get("category"), ())
+    # Keep these as Unicode escapes: this file is edited on Windows systems
+    # with different console encodings, but the matching terms must stay exact.
+    category_terms = {
+        "pokemon": ("\u30dd\u30b1\u30e2\u30f3", "\u30dd\u30b1\u30ab"),
+        "onepiece": ("one piece", "\u30ef\u30f3\u30d4\u30fc\u30b9"),
+        "both": ("\u30dd\u30b1\u30e2\u30f3", "\u30dd\u30b1\u30ab", "one piece", "\u30ef\u30f3\u30d4\u30fc\u30b9"),
+    }.get(source.get("category"), ())
     soup = BeautifulSoup(html, "html.parser")
     urls = []
     seen = set()
@@ -34,6 +41,17 @@ def official_detail_urls(html: str, page_url: str, source: dict, limit: int) -> 
         label = " ".join(link.get_text(" ", strip=True).split())
         url = urljoin(page_url, link["href"])
         haystack = f"{label} {url}".lower()
+        if (
+            url.startswith("http")
+            and any(term.lower() in haystack for term in category_terms)
+            and any(term in label for term in ("\u62bd\u9078", "\u5fdc\u52df", "\u8ca9\u58f2"))
+            and url not in seen
+        ):
+            seen.add(url)
+            urls.append(url)
+            if len(urls) >= limit:
+                break
+            continue
         if (
             url.startswith("http")
             and any(term.lower() in haystack for term in category_terms)
@@ -131,6 +149,31 @@ def main():
     build_calendar([x.to_dict() for x in items], ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
 
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
+    calendar_url = os.getenv("CALENDAR_URL")
+    notified = {
+        notification_identity(previous["store"], previous["title"], previous["application_url"])
+        for previous in old.values()
+        if previous.get("store") and previous.get("title") and previous.get("application_url")
+    }
+    new_items = []
+    for item in items:
+        key = notification_identity(item.store, item.title, item.application_url)
+        if key in notified:
+            continue
+        notified.add(key)
+        if item.eligibility != "ineligible" and item.start_at and item.deadline:
+            new_items.append(item)
+    if webhook:
+        for item in new_items[:25]:
+            try:
+                send_new(webhook, item, calendar_url)
+            except Exception as exc:
+                print(f"WARN Discord {item.title}: {exc}")
+        print(f"Collected {len(items)} items. Sent {len(new_items)} new Discord notifications.")
+    else:
+        print(f"Collected {len(items)} items. DISCORD_WEBHOOK_URL is not configured; notification skipped.")
+    return
+
     if not webhook:
         print(f"Collected {len(items)} items. DISCORD_WEBHOOK_URL is not configured; notification skipped.")
         return
