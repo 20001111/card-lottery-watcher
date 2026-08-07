@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urljoin
 from zoneinfo import ZoneInfo
@@ -79,6 +79,11 @@ def main():
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     now = datetime.now(ZoneInfo(config.get("timezone", "Asia/Tokyo")))
     old = load_state()
+    old_by_notification = {
+        notification_identity(previous["store"], previous["title"], previous["application_url"]): previous
+        for previous in old.values()
+        if previous.get("store") and previous.get("title") and previous.get("application_url")
+    }
     collected = {}
     queued_for_review = 0
 
@@ -157,25 +162,31 @@ def main():
     items = list(collected.values())
     items.sort(key=lambda x: (x.eligibility not in ("eligible", "check"), x.deadline or "9999"))
 
-    notified = {
-        notification_identity(previous["store"], previous["title"], previous["application_url"])
-        for previous in old.values()
-        if previous.get("store") and previous.get("title") and previous.get("application_url")
-    }
+    notified = set(old_by_notification)
     new_items = []
     calendar_items = []
     for item in items:
         key = notification_identity(item.store, item.title, item.application_url)
-        is_new = key not in notified
+        previous = old_by_notification.get(key)
+        if previous:
+            # Entries collected before this update have no first_seen_at. They
+            # are existing information, not a fresh announcement.
+            item.first_seen_at = previous.get("first_seen_at") or (now - timedelta(days=2)).isoformat()
+        else:
+            item.first_seen_at = now.isoformat()
+        first_seen = datetime.fromisoformat(item.first_seen_at)
+        is_new = first_seen >= now - timedelta(days=1)
         if is_new and item.eligibility != "ineligible" and item.start_at and item.deadline:
             new_items.append(item)
         item_for_calendar = item.to_dict()
         item_for_calendar["is_new"] = is_new
         calendar_items.append(item_for_calendar)
 
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps([x.to_dict() for x in items], ensure_ascii=False, indent=2), encoding="utf-8")
-    build_calendar(calendar_items, ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
+    publish_public = os.getenv("PUBLISH_PUBLIC", "true").lower() == "true"
+    if publish_public:
+        STATE.parent.mkdir(parents=True, exist_ok=True)
+        STATE.write_text(json.dumps([x.to_dict() for x in items], ensure_ascii=False, indent=2), encoding="utf-8")
+        build_calendar(calendar_items, ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
 
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
     admin_webhook = os.getenv("ADMIN_DISCORD_WEBHOOK_URL")
@@ -184,7 +195,13 @@ def main():
     daily_site_update = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
     if webhook and (new_items or daily_site_update):
         try:
-            send_site_update(webhook, len(new_items), calendar_url, daily=daily_site_update)
+            send_site_update(
+                webhook,
+                len(new_items),
+                calendar_url,
+                daily=daily_site_update,
+                development=not publish_public,
+            )
         except Exception as exc:
             print(f"WARN Discord site update: {exc}")
         print(f"Collected {len(items)} items. Sent one site-update notification for {len(new_items)} new lotteries.")

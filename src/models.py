@@ -40,6 +40,9 @@ class Lottery:
     eligibility_reasons: list[str] = field(default_factory=list)
     status: str = "open"
     discord_message_id: Optional[str] = None
+    # Kept in state so the Website can show NEW for a full day, rather than
+    # only for the single collection run where the lottery was found.
+    first_seen_at: Optional[str] = None
 
     def to_dict(self):
         return asdict(self)

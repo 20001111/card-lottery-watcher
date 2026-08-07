@@ -41,8 +41,12 @@ jobs:
           ADMIN_DISCORD_WEBHOOK_URL: ${{ secrets.ADMIN_DISCORD_WEBHOOK_URL }}
           ADMIN_DASHBOARD_URL: https://card-lottery-ops.tkt-1234.chatgpt.site
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
+          # Development runs are a notification/collection test only.  They
+          # must not replace the public Website or its saved new-item state.
+          PUBLISH_PUBLIC: ${{ (github.event_name == 'schedule' || inputs.notification_target == 'production') && 'true' || 'false' }}
         run: python -m src.main
       - name: Save state
+        if: github.event_name == 'schedule' || inputs.notification_target == 'production'
         run: |
           git config user.name "lottery-bot"
           git config user.email "actions@users.noreply.github.com"

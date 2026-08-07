@@ -68,10 +68,18 @@ def send_new(webhook_url: str, item, calendar_url: str | None = None):
     return response.json()["id"]
 
 
-def send_site_update(webhook_url: str, new_count: int, calendar_url: str | None = None, daily: bool = False):
+def send_site_update(
+    webhook_url: str,
+    new_count: int,
+    calendar_url: str | None = None,
+    daily: bool = False,
+    development: bool = False,
+):
     """Post one small alert; all lottery details live on the website."""
     destination = calendar_url or ""
-    if daily and new_count:
+    if development:
+        message = "🧪 開発テストが完了しました。公開Websiteは更新していません。"
+    elif daily and new_count:
         message = f"\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002\u65b0\u7740\u304c{new_count}\u4ef6\u3042\u308a\u307e\u3059\u3002"
     elif daily:
         message = "\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002"
