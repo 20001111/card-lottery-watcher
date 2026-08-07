@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from .ai_extract import extract_with_ai, page_document
 from .calendar import build_calendar
-from .discord_notify import send_new
+from .discord_notify import send_site_update
 from .eligibility import evaluate
 from .models import Lottery, lottery_identity, notification_identity
 from .x_discovery import candidate_sources
@@ -144,32 +144,37 @@ def main():
     items = list(collected.values())
     items.sort(key=lambda x: (x.eligibility not in ("eligible", "check"), x.deadline or "9999"))
 
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps([x.to_dict() for x in items], ensure_ascii=False, indent=2), encoding="utf-8")
-    build_calendar([x.to_dict() for x in items], ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
-
-    webhook = os.getenv("DISCORD_WEBHOOK_URL")
-    calendar_url = os.getenv("CALENDAR_URL")
     notified = {
         notification_identity(previous["store"], previous["title"], previous["application_url"])
         for previous in old.values()
         if previous.get("store") and previous.get("title") and previous.get("application_url")
     }
     new_items = []
+    calendar_items = []
     for item in items:
         key = notification_identity(item.store, item.title, item.application_url)
-        if key in notified:
-            continue
-        notified.add(key)
-        if item.eligibility != "ineligible" and item.start_at and item.deadline:
+        is_new = key not in notified
+        if is_new and item.eligibility != "ineligible" and item.start_at and item.deadline:
             new_items.append(item)
-    if webhook:
-        for item in new_items[:25]:
-            try:
-                send_new(webhook, item, calendar_url)
-            except Exception as exc:
-                print(f"WARN Discord {item.title}: {exc}")
-        print(f"Collected {len(items)} items. Sent {len(new_items)} new Discord notifications.")
+        item_for_calendar = item.to_dict()
+        item_for_calendar["is_new"] = is_new
+        calendar_items.append(item_for_calendar)
+
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    STATE.write_text(json.dumps([x.to_dict() for x in items], ensure_ascii=False, indent=2), encoding="utf-8")
+    build_calendar(calendar_items, ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
+
+    webhook = os.getenv("DISCORD_WEBHOOK_URL")
+    calendar_url = os.getenv("CALENDAR_URL")
+    daily_site_update = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
+    if webhook and (new_items or daily_site_update):
+        try:
+            send_site_update(webhook, len(new_items), calendar_url, daily=daily_site_update)
+        except Exception as exc:
+            print(f"WARN Discord site update: {exc}")
+        print(f"Collected {len(items)} items. Sent one site-update notification for {len(new_items)} new lotteries.")
+    elif webhook:
+        print(f"Collected {len(items)} items. No new lotteries; Discord notification skipped.")
     else:
         print(f"Collected {len(items)} items. DISCORD_WEBHOOK_URL is not configured; notification skipped.")
     return

@@ -66,3 +66,19 @@ def send_new(webhook_url: str, item, calendar_url: str | None = None):
     response.raise_for_status()
     time.sleep(0.4)
     return response.json()["id"]
+
+
+def send_site_update(webhook_url: str, new_count: int, calendar_url: str | None = None, daily: bool = False):
+    """Post one small alert; all lottery details live on the website."""
+    destination = calendar_url or ""
+    if daily and new_count:
+        message = f"\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002\u65b0\u7740\u304c{new_count}\u4ef6\u3042\u308a\u307e\u3059\u3002"
+    elif daily:
+        message = "\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002"
+    else:
+        message = f"\U0001f195 \u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002\u65b0\u7740\u304c{new_count}\u4ef6\u3042\u308a\u307e\u3059\u3002"
+    if destination:
+        message += f"\n\n\U0001f517 \u8a73\u7d30\u30fb\u6761\u4ef6\u30fb\u5fdc\u52df\u30ea\u30f3\u30af\u306f\u3053\u3061\u3089\n{destination}"
+    response = requests.post(webhook_url, params={"wait": "true"}, json={"content": message}, timeout=20)
+    response.raise_for_status()
+    return response.json()["id"]

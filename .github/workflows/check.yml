@@ -2,8 +2,8 @@ name: Card lottery watcher
 
 on:
   schedule:
-    - cron: "30 7 * * *"
-      timezone: "Asia/Tokyo"
+    # GitHub Actions の cron は UTC。毎日 09:00（日本時間）。
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       notification_target:
@@ -33,6 +33,7 @@ jobs:
           # default to the private development channel unless explicitly set
           # to production from the Run workflow menu.
           DISCORD_WEBHOOK_URL: ${{ (github.event_name == 'schedule' || inputs.notification_target == 'production') && secrets.DISCORD_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_DEV_URL }}
+          DAILY_SITE_UPDATE: ${{ github.event_name == 'schedule' && 'true' || 'false' }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
