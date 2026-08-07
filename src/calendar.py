@@ -133,8 +133,9 @@ def _lottery_list(entries: list[tuple[dict, datetime, datetime]], now: datetime)
     for item, start, deadline in active:
         store = escape(item.get("store", "\u5e97\u8217\u540d\u4e0d\u660e"))
         title = escape(item.get("title", "\u62bd\u9078"))
+        item_id = escape(str(item.get("id", "")), quote=True)
         cards.append(
-            '<details class="lottery-card">'
+            f'<details id="lottery-{item_id}" class="lottery-card">'
             f'<summary><strong>{store}</strong><span>{start:%m/%d %H:%M} \u301c {deadline:%m/%d %H:%M}</span><b>{title}</b></summary>'
             f'{_detail(item, start, deadline)}</details>'
         )
@@ -210,7 +211,7 @@ def build_calendar(items: list[dict], destination: Path, timezone: str = "Asia/T
 .bar summary strong{{display:inline-block;margin-right:4px;padding:1px 4px;border-radius:4px;background:#ffffffa8;font-weight:800}}
 .current{{margin:22px 0 34px}}.lottery-card{{display:block;border:1px solid var(--line);border-left:5px solid #2563eb;border-radius:10px;margin:9px 0;background:#fff}}.lottery-card summary{{cursor:pointer;list-style:none;padding:12px}}.lottery-card summary::-webkit-details-marker{{display:none}}.lottery-card summary strong{{display:inline-block;margin-right:8px;color:#1d4ed8}}.lottery-card summary span{{display:block;color:var(--muted);font-size:.82rem;margin:4px 0}}.lottery-card summary b{{font-size:.94rem}}.lottery-card .detail{{margin:0 10px 10px}}
 @media(max-width:650px){{main{{padding:16px 4px 30px}}h1{{padding:0 8px;font-size:1.35rem}}.sub{{padding:0 8px;font-size:.82rem}}h2{{padding:0 8px;font-size:1.05rem}}.weekdays{{font-size:.72rem}}.week{{min-height:108px;padding-top:6px}}.date{{padding:0 3px;font-size:.8rem}}.bar{{font-size:.61rem}}.bar summary{{padding:4px 3px}}.detail{{font-size:.78rem;min-width:205px}}}}
-</style></head><body><main><h1>\u30ab\u30fc\u30c9\u62bd\u9078\u30ab\u30ec\u30f3\u30c0\u30fc</h1><p class="sub">\u958b\u59cb\u65e5\u3068\u7d42\u4e86\u65e5\u304c\u78ba\u8a8d\u3067\u304d\u305f\u62bd\u9078\u3060\u3051\u3092\u63b2\u8f09\u3057\u307e\u3059\u3002</p>{_lottery_list(entries, now)}<p><a class="review-link" href="pending.html">\u78ba\u8a8d\u5f85\u3061\u306e\u60c5\u5831\u3092\u898b\u308b</a></p><h2>\u53d7\u4ed8\u671f\u9593\u30ab\u30ec\u30f3\u30c0\u30fc</h2>{body}</main></body></html>'''
+</style></head><body><main><h1>\u30ab\u30fc\u30c9\u62bd\u9078\u30ab\u30ec\u30f3\u30c0\u30fc</h1><p class="sub">\u958b\u59cb\u65e5\u3068\u7d42\u4e86\u65e5\u304c\u78ba\u8a8d\u3067\u304d\u305f\u62bd\u9078\u3060\u3051\u3092\u63b2\u8f09\u3057\u307e\u3059\u3002</p>{_lottery_list(entries, now)}<p><a class="review-link" href="pending.html">\u78ba\u8a8d\u5f85\u3061\u306e\u60c5\u5831\u3092\u898b\u308b</a></p><h2>\u53d7\u4ed8\u671f\u9593\u30ab\u30ec\u30f3\u30c0\u30fc</h2>{body}</main><script>const target=document.querySelector(location.hash);if(target&&target.tagName==='DETAILS'){{target.open=true;setTimeout(()=>target.scrollIntoView({{block:'center'}}),0);}}</script></body></html>'''
     (destination / "index.html").write_text(page, encoding="utf-8")
     (destination / "pending.html").write_text(_pending_page(pending_items), encoding="utf-8")
     (destination / "lotteries.json").write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")

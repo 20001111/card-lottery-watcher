@@ -43,7 +43,9 @@ def send_or_update(webhook_url: str, item):
 
 def send_new(webhook_url: str, item, calendar_url: str | None = None):
     """Post one compact alert for a newly discovered lottery only."""
-    destination = calendar_url or item.application_url
+    # The website is the source of truth.  Link directly to this lottery's
+    # expandable detail card, rather than taking people straight to a store.
+    destination = f"{calendar_url}#lottery-{item.id}" if calendar_url else item.application_url
     start_at = item.start_at or "-"
     deadline = item.deadline or "-"
     payload = {
@@ -55,7 +57,7 @@ def send_new(webhook_url: str, item, calendar_url: str | None = None):
             "description": (
                 f"**\u5e97\u8217**\uff1a{item.store}\n"
                 f"**\u53d7\u4ed8\u671f\u9593**\uff1a{start_at} \u301c {deadline}\n"
-                "\u8a73\u7d30\u306fWeb\u30b5\u30a4\u30c8\u3067\u78ba\u8a8d\u3067\u304d\u307e\u3059\u3002"
+                f"[\U0001f517 Web\u30b5\u30a4\u30c8\u3067\u8a73\u7d30\u3068\u6761\u4ef6\u3092\u78ba\u8a8d\u3059\u308b]({destination})"
             ),
             "footer": {"text": "\u30ab\u30fc\u30c9\u62bd\u9078\u901a\u77e5"},
         }],
