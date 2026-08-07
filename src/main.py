@@ -10,8 +10,9 @@ import yaml
 from bs4 import BeautifulSoup
 
 from .ai_extract import extract_with_ai, page_document
+from .admin_queue import send_candidate
 from .calendar import build_calendar
-from .discord_notify import send_site_update
+from .discord_notify import send_review_queue_update, send_site_update
 from .eligibility import evaluate
 from .models import Lottery, lottery_identity, notification_identity
 from .x_discovery import candidate_sources
@@ -79,6 +80,7 @@ def main():
     now = datetime.now(ZoneInfo(config.get("timezone", "Asia/Tokyo")))
     old = load_state()
     collected = {}
+    queued_for_review = 0
 
     headers = {"User-Agent": "CardLotteryWatcher/1.0 (+personal notification bot)"}
     detail_limit = int(config.get("official_detail_link_limit", 2))
@@ -102,9 +104,20 @@ def main():
                         detail_response.raise_for_status()
                         pages.append(({**source, "url": detail_url, "name": f"{source['name']} 詳細"}, detail_response.text))
             for page_source, html in pages:
-                document, allowed_links = page_document(html, page_source["url"])
+                document, allowed_links = page_document(
+                    html,
+                    page_source["url"],
+                    max_chars=int(config.get("ai_page_max_chars", 18000)),
+                )
                 extracted = extract_with_ai(page_source, document, allowed_links, now, config)
                 for raw in extracted:
+                    if not raw.get("start_at") or not raw.get("deadline"):
+                        if send_candidate(raw, page_source):
+                            queued_for_review += 1
+                            print(f"QUEUED for review: {raw.get('title', '')}")
+                        else:
+                            print("WARN incomplete candidate skipped: ADMIN_QUEUE_URL or ADMIN_QUEUE_KEY is not configured")
+                        continue
                     identity = lottery_identity(raw["store"], raw["title"], raw["application_url"], raw.get("deadline"))
                     conditions = list(raw.get("requirements") or [])
                     item = Lottery(
@@ -165,6 +178,8 @@ def main():
     build_calendar(calendar_items, ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
 
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
+    admin_webhook = os.getenv("ADMIN_DISCORD_WEBHOOK_URL")
+    admin_dashboard_url = os.getenv("ADMIN_DASHBOARD_URL")
     calendar_url = os.getenv("CALENDAR_URL")
     daily_site_update = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
     if webhook and (new_items or daily_site_update):
@@ -177,6 +192,11 @@ def main():
         print(f"Collected {len(items)} items. No new lotteries; Discord notification skipped.")
     else:
         print(f"Collected {len(items)} items. DISCORD_WEBHOOK_URL is not configured; notification skipped.")
+    if admin_webhook and queued_for_review:
+        try:
+            send_review_queue_update(admin_webhook, queued_for_review, admin_dashboard_url)
+        except Exception as exc:
+            print(f"WARN Discord review-queue update: {exc}")
     return
 
     if not webhook:

@@ -82,3 +82,13 @@ def send_site_update(webhook_url: str, new_count: int, calendar_url: str | None 
     response = requests.post(webhook_url, params={"wait": "true"}, json={"content": message}, timeout=20)
     response.raise_for_status()
     return response.json()["id"]
+
+
+def send_review_queue_update(webhook_url: str, count: int, dashboard_url: str | None = None):
+    """Alert the private operations channel without exposing candidate details."""
+    message = f"🛠️ 確認待ちの抽選候補が{count}件追加されました。"
+    if dashboard_url:
+        message += f"\n\n🔐 管理サイトで確認・補完・承認する\n{dashboard_url}"
+    response = requests.post(webhook_url, params={"wait": "true"}, json={"content": message}, timeout=20)
+    response.raise_for_status()
+    return response.json()["id"]

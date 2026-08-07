@@ -11,7 +11,7 @@ from dateutil import parser as date_parser
 API_URL = "https://api.openai.com/v1/chat/completions"
 
 
-def page_document(html: str, page_url: str, max_chars: int = 30000):
+def page_document(html: str, page_url: str, max_chars: int = 18000):
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup.select("script, style, noscript, svg, header, footer"):
         tag.decompose()
@@ -72,6 +72,9 @@ when it is an official brand, store, or authorised retailer's actual application
 page. Do not treat an X post, a news article, or an aggregation page as official.
 Only include a result when the page states a real future application deadline and
 the evidence states the dates and application conditions you found.
+If an actual application link exists but either start_at or deadline is missing,
+also include it as an unconfirmed candidate with that value set to null. Never
+invent dates. It will go to the private review dashboard, not the public site.
 """
     response = requests.post(
         API_URL,
@@ -84,7 +87,7 @@ the evidence states the dates and application conditions you found.
             "response_format": {"type": "json_object"},
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         },
-        timeout=90,
+        timeout=int(config.get("ai_request_timeout_seconds", 45)),
     )
     if not response.ok:
         # Include the provider's safe error message in Actions logs. This makes
@@ -95,14 +98,16 @@ the evidence states the dates and application conditions you found.
     data = _json_content(response.json()["choices"][0]["message"]["content"])
     valid = []
     for item in data.get("lotteries", []):
-        try:
-            deadline = date_parser.isoparse(item["deadline"])
-        except (KeyError, TypeError, ValueError):
-            continue
-        if deadline.tzinfo is None or not (now < deadline <= now + __import__("datetime").timedelta(days=max_days)):
-            continue
+        deadline_value = item.get("deadline")
+        if deadline_value:
+            try:
+                deadline = date_parser.isoparse(deadline_value)
+            except (TypeError, ValueError):
+                continue
+            if deadline.tzinfo is None or not (now < deadline <= now + __import__("datetime").timedelta(days=max_days)):
+                continue
         url = item.get("application_url")
-        if url not in allowed_links and url != source["url"]:
+        if not url or (url not in allowed_links and url != source["url"]):
             continue
         if item.get("card_type") not in ("pokemon", "onepiece"):
             continue
