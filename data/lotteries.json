@@ -1,5 +1,189 @@
 [
   {
+    "id": "32a58e5d5cec31bac65f",
+    "title": "ポケモンカード スタートデッキ100 バトルコレクション 抽選（お宝創庫・プレイズ）",
+    "category": "pokemon",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.otakarasouko.com/information/95974455/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "f5e3140be6162c575062",
+    "title": "ポケモンカード ストームエメラルダ／メガブレイブ／メガシンフォニア 抽選（お宝創庫・プレイズ）",
+    "category": "pokemon",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.otakarasouko.com/information/95974456/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "a31d1725778f1113a627",
+    "title": "ワンピースカードゲーム スタートデッキEX ルフィ＆エース[ST-30] 抽選（お宝創庫・プレイズ）",
+    "category": "onepiece",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員であること",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の上売買利用した履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "17ca617d5c61132e874d",
+    "title": "ポケモンカード ストームエメラルダ・メガブレイブ・メガシンフォニア 抽選（お宝創庫・プレイズ）",
+    "category": "pokemon",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.otakarasouko.com/information/95974456/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示して売買利用した履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "5717cf11a595fb1c3bc5",
+    "title": "ポケモンカード ストームエメラルダ / メガブレイブ / メガシンフォニア 抽選（お宝創庫・プレイズ）",
+    "category": "pokemon",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://www.otakarasouko.com/information/95974456/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証を提示して売買利用した履歴"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "98a8a8efc515a9eb3f73",
+    "title": "ワンピースカードゲーム スタートデッキEX ルフィ＆エース[ST-30] 抽選",
+    "category": "onepiece",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "c4bcab71ca90757f3f04",
+    "title": "ONE PIECEカードゲーム スタートデッキEX ルフィ＆エース[ST-30] 抽選（お宝創庫・プレイズ）",
+    "category": "onepiece",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "17c7c4536a16bee8ad69",
+    "title": "お宝創庫・プレイズ 抽選：ワンピースカードゲーム スタートデッキEX ルフィ＆エース [ST-30]",
+    "category": "onepiece",
+    "store": "お宝創庫・プレイズ",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
+    "deadline": "2026-08-09T23:45:00+09:00",
+    "start_at": "2026-08-06T12:00:00+09:00",
+    "conditions": [
+      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
+      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
     "id": "a008564aa157b82b1974",
     "title": "お宝創庫・プレイズ 抽選（ポケモンカード スタートデッキ100 バトルコレクション）",
     "category": "pokemon",
@@ -46,18 +230,149 @@
     "discord_message_id": null
   },
   {
-    "id": "98a8a8efc515a9eb3f73",
-    "title": "ワンピースカードゲーム スタートデッキEX ルフィ＆エース[ST-30] 抽選",
-    "category": "onepiece",
-    "store": "お宝創庫・プレイズ",
+    "id": "68f5e5fea936a0e0160e",
+    "title": "ポケモンカード 各種抽選（エディオン・トレカキャピタル各店）",
+    "category": "pokemon",
+    "store": "エディオン・トレカキャピタル各店",
     "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
-    "deadline": "2026-08-09T23:45:00+09:00",
-    "start_at": "2026-08-06T12:00:00+09:00",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082801",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
     "conditions": [
-      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示して売買利用した履歴があること"
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "26f76282a639fa399aa7",
+    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア等） 抽選（エディオン）",
+    "category": "pokemon",
+    "store": "エディオン",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082801",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "f7264327240c653ca57d",
+    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア等） 抽選（トレカキャピタル）",
+    "category": "pokemon",
+    "store": "トレカキャピタル",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082802",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "ac6c82f21efb6964aa37",
+    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア） 抽選（エディオン）",
+    "category": "pokemon",
+    "store": "エディオン（トレカキャピタル含む）",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082801",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "e50153a2d7f4e63438b2",
+    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア） 抽選（トレカキャピタル）",
+    "category": "pokemon",
+    "store": "トレカキャピタル",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082802",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "0f674fc168f9d7290fd7",
+    "title": "ポケモンカード 各種 抽選（エディオン・トレカキャピタル各店）",
+    "category": "pokemon",
+    "store": "エディオン・トレカキャピタル各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082801",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "check",
+    "eligibility_reasons": [
+      "アプリを要確認"
+    ],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "2ffd4e61e5e8b7392fb8",
+    "title": "ポケモンカード スタートデッキ100 バトルコレクション／ストームエメラルダ／メガブレイブ／メガシンフォニア 抽選（エディオン・トレカキャピタル各店）",
+    "category": "pokemon",
+    "store": "エディオン・トレカキャピタル各店",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/2459",
+    "application_url": "https://edion-cp.com/pokeca082801",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
+    "conditions": [
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
     ],
     "source_kind": "discovery",
     "official_confirmed": false,
@@ -113,16 +428,19 @@
     "discord_message_id": null
   },
   {
-    "id": "ededcb5c0c9bf8756eb1",
-    "title": "ポケモンカードラウンジ渋谷店 WEB抽選（ポケモンカード スタートデッキ100 バトルコレクション）",
+    "id": "b851b428213b51127a31",
+    "title": "ポケモンカード ストームエメラルダ／メガブレイブ／メガシンフォニア／スタートデッキ100 バトルコレクション 抽選（ポケモンカード）",
     "category": "pokemon",
-    "store": "ポケモンカードラウンジ渋谷店",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://cloud-pass.jp/pr/b14d198d7f0e9c11d59c60b660303306f86190392740ab078a05172058550ae7",
-    "deadline": "2026-08-07T23:59:00+09:00",
-    "start_at": "2026-08-05T10:00:00+09:00",
-    "conditions": [],
+    "store": "カードボックス オーサカ店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=97dS8GLi4T",
+    "deadline": "2026-08-08T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "会員"
+    ],
     "source_kind": "discovery",
     "official_confirmed": false,
     "eligibility": "unknown",
@@ -131,8 +449,133 @@
     "discord_message_id": null
   },
   {
-    "id": "a17390f8e743b67959b6",
-    "title": "トレカプラザ55通販 - ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選受付",
+    "id": "defab06542746f5dd17f",
+    "title": "世界最強の戦士 抽選（ONE PIECEカード）",
+    "category": "onepiece",
+    "store": "JUMP SHOP各店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://jumpshop-benelic.com/pages/about-enter-shop",
+    "deadline": "2026-08-08T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "SNS応募"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "4005e10261104ecf6cb6",
+    "title": "ポケモンカード ストームエメラルダ / メガブレイブ / メガシンフォニア / スタートデッキ100 バトルコレクション — カードボックス オーサカ店 抽選",
+    "category": "pokemon",
+    "store": "カードボックス オーサカ店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=97dS8GLi4T",
+    "deadline": "2026-08-08T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "会員"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "d965b9170b3ef3d89b3b",
+    "title": "世界最強の戦士 — JUMP SHOP各店 抽選",
+    "category": "onepiece",
+    "store": "JUMP SHOP各店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://jumpshop-benelic.com/pages/about-enter-shop",
+    "deadline": "2026-08-08T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "SNS応募"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "b3d04dae4abede29614c",
+    "title": "30周年エーフィ・ブラッキーデッキ 抽選（ポケモンカード）",
+    "category": "pokemon",
+    "store": "カードボックス 池袋店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=OHUXLecZR9",
+    "deadline": "2026-08-10T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "SNS応募"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "4b908792c0b505c58396",
+    "title": "30周年パック 抽選（ポケモンカード）",
+    "category": "pokemon",
+    "store": "カードボックス 池袋店",
+    "store_key": "cardchusen",
+    "source_url": "https://cardchusen.com/",
+    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=UmdTwPXbr1",
+    "deadline": "2026-08-10T23:59:00+09:00",
+    "start_at": null,
+    "conditions": [
+      "オンライン",
+      "SNS応募"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "8fa4eb7d5f9c8c047d16",
+    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選（トレカプラザ55通販）",
+    "category": "onepiece",
+    "store": "トレカプラザ55通販",
+    "store_key": "nyuka_now",
+    "source_url": "https://nyuka-now.com/archives/97393",
+    "application_url": "https://docs.google.com/forms/d/e/1FAIpQLSffABPUyiR62_4WCWrJJs3GI7JPee7B9sC8Eh3qqCR9nSo1YA/viewform",
+    "deadline": "2026-08-11T23:59:00+09:00",
+    "start_at": "2026-07-31T20:00:00+09:00",
+    "conditions": [
+      "当選者にはオンライン販売（応募は1件につき詳細は応募ページ参照）"
+    ],
+    "source_kind": "discovery",
+    "official_confirmed": false,
+    "eligibility": "unknown",
+    "eligibility_reasons": [],
+    "status": "open",
+    "discord_message_id": null
+  },
+  {
+    "id": "bab80dba9fd67fe25b5a",
+    "title": "トレカプラザ55通販 WEB抽選：ONE PIECEカードゲーム ブースターパック 世界最強の戦士 [OP-17]",
     "category": "onepiece",
     "store": "トレカプラザ55通販",
     "store_key": "nyuka_now",
@@ -149,8 +592,8 @@
     "discord_message_id": null
   },
   {
-    "id": "8fa4eb7d5f9c8c047d16",
-    "title": "ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選（トレカプラザ55通販）",
+    "id": "a17390f8e743b67959b6",
+    "title": "トレカプラザ55通販 - ONE PIECEカードゲーム ブースターパック 世界最強の戦士【OP-17】 WEB抽選受付",
     "category": "onepiece",
     "store": "トレカプラザ55通販",
     "store_key": "nyuka_now",
