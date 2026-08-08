@@ -74,13 +74,19 @@ def send_site_update(
     calendar_url: str | None = None,
     daily: bool = False,
     development: bool = False,
+    started_count: int = 0,
 ):
     """Post one small alert; all lottery details live on the website."""
     destination = calendar_url or ""
     if development:
         message = "🧪 開発テストが完了しました。公開Websiteは更新していません。"
-    elif daily and new_count:
-        message = f"\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002\u65b0\u7740\u304c{new_count}\u4ef6\u3042\u308a\u307e\u3059\u3002"
+    elif daily and (new_count or started_count):
+        details = []
+        if new_count:
+            details.append(f"\u65b0\u7740{new_count}\u4ef6")
+        if started_count:
+            details.append(f"\U0001f680 \u672c\u65e5\u5fdc\u52df\u958b\u59cb{started_count}\u4ef6")
+        message = f"\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002{' / '.join(details)}\u3042\u308a\u307e\u3059\u3002"
     elif daily:
         message = "\U0001f4c5 \u672c\u65e5\u306e\u62bd\u9078\u60c5\u5831\u3092\u66f4\u65b0\u3057\u307e\u3057\u305f\u3002"
     else:

@@ -171,6 +171,7 @@ def main():
 
     notified = set(old_by_notification)
     new_items = []
+    started_items = []
     calendar_items = []
     for item in items:
         key = notification_identity(item.store, item.title, item.application_url)
@@ -183,6 +184,18 @@ def main():
             item.first_seen_at = now.isoformat()
         first_seen = datetime.fromisoformat(item.first_seen_at)
         is_new = first_seen >= now - timedelta(days=1)
+        start_time = datetime.fromisoformat(item.start_at.replace("Z", "+00:00")) if item.start_at else None
+        if start_time and start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=now.tzinfo)
+        if previous and "start_notified_at" in previous:
+            item.start_notified_at = previous.get("start_notified_at")
+            if not item.start_notified_at and start_time and start_time <= now:
+                started_items.append(item)
+                item.start_notified_at = now.isoformat()
+        elif start_time and start_time <= now:
+            # Existing entries from before this feature are marked as already
+            # started once, so enabling it never sends a backlog of alerts.
+            item.start_notified_at = now.isoformat()
         if is_new and item.eligibility != "ineligible" and item.start_at and item.deadline:
             new_items.append(item)
         item_for_calendar = item.to_dict()
@@ -208,10 +221,14 @@ def main():
                 calendar_url,
                 daily=daily_site_update,
                 development=not publish_public,
+                started_count=len(started_items),
             )
         except Exception as exc:
             print(f"WARN Discord site update: {exc}")
-        print(f"Collected {len(items)} items. Sent one site-update notification for {len(new_items)} new lotteries.")
+        print(
+            f"Collected {len(items)} items. Sent one site-update notification for "
+            f"{len(new_items)} new lotteries and {len(started_items)} started lotteries."
+        )
     elif webhook:
         print(f"Collected {len(items)} items. No new lotteries; Discord notification skipped.")
     else:
@@ -223,7 +240,7 @@ def main():
             print(f"WARN Discord review-queue update: {exc}")
     print(
         f"SUMMARY sources={source_count} extracted={extracted_count} "
-        f"public={len(items)} new={len(new_items)} review_needed={queued_for_review}"
+        f"public={len(items)} new={len(new_items)} started={len(started_items)} review_needed={queued_for_review}"
     )
     return
 

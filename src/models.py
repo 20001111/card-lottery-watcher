@@ -45,6 +45,9 @@ class Lottery:
     # Kept in state so the Website can show NEW for a full day, rather than
     # only for the single collection run where the lottery was found.
     first_seen_at: Optional[str] = None
+    # A future lottery is announced once more when its application period
+    # actually begins.  Stored state prevents the 09:00 digest repeating it.
+    start_notified_at: Optional[str] = None
 
     def to_dict(self):
         return asdict(self)

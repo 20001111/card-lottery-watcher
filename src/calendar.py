@@ -48,18 +48,14 @@ def _detail(item: dict, start: datetime, deadline: datetime) -> str:
     verification = "\u516c\u5f0f\u78ba\u8a8d\u6e08\u307f" if item.get("official_confirmed") else "\u516c\u5f0f\u78ba\u8a8d\u5f85\u3061"
     evidence = item.get("evidence") or "\u30ea\u30f3\u30af\u5148\u306e\u8a73\u7d30\u3092\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044"
     url = escape(item.get("application_url", "#"), quote=True)
-    application = {"online": "Web\u30fb\u30a2\u30d7\u30ea\u3067\u5fdc\u52df", "store": "\u5e97\u982d\u3067\u5fdc\u52df", "unknown": "\u5fdc\u52df\u65b9\u6cd5\u3092\u78ba\u8a8d"}.get(item.get("application_method"), "\u5fdc\u52df\u65b9\u6cd5\u3092\u78ba\u8a8d")
-    receipt = {"delivery": "\u914d\u9001\u3042\u308a", "store_pickup": "\u5e97\u982d\u53d7\u53d6", "unknown": "\u53d7\u53d6\u65b9\u6cd5\u3092\u78ba\u8a8d"}.get(item.get("receipt_method"), "\u53d7\u53d6\u65b9\u6cd5\u3092\u78ba\u8a8d")
     return (
         '<div class="detail">'
         f'<p>\U0001f3ea <b>\u5e97\u8217</b>{escape(item.get("store", "\u8a18\u8f09\u306a\u3057"))}</p>'
         f'<p>\U0001f4c5 <b>\u958b\u59cb</b>{start:%m/%d %H:%M}</p>'
         f'<p>\u23f0 <b>\u7de0\u5207</b>{deadline:%m/%d %H:%M}</p>'
         f'<p class="condition-detail">\U0001f4cb <b>\u5fdc\u52df\u6761\u4ef6</b>{escape(conditions)}</p>'
-        f'<p>\U0001f4bb <b>\u5fdc\u52df</b>{application}</p>'
-        f'<p>\U0001f4e6 <b>\u53d7\u53d6</b>{receipt}</p>'
         f'<p><b>{verification}</b>{escape(evidence)}</p>'
-        f'<a href="{url}" target="_blank" rel="noreferrer">\u5fdc\u52df\u30da\u30fc\u30b8\u3092\u958b\u304f</a></div>'
+        f'<a href="{url}" target="_blank" rel="noreferrer">\U0001f310 Web\u3067\u5fdc\u52df\u30da\u30fc\u30b8\u3092\u958b\u304f</a></div>'
     )
 
 
@@ -144,11 +140,19 @@ def _month(year: int, month: int, entries: list[tuple[dict, datetime, datetime]]
     return f'<section class="month"><h2>{year}\u5e74{month}\u6708</h2><div class="weekdays">{headers}</div>{"".join(weeks)}</section>'
 
 
-def _lottery_list(entries: list[tuple[dict, datetime, datetime]], now: datetime) -> str:
-    """The readable first view: only lotteries still open right now."""
-    active = sorted((entry for entry in entries if entry[2] > now), key=lambda entry: entry[2])
+def _lottery_list(entries: list[tuple[dict, datetime, datetime]], now: datetime, view: str = "active") -> str:
+    """Build separate lists for lotteries open now and lotteries opening later."""
+    is_active = view == "active"
+    active = sorted(
+        (entry for entry in entries if entry[1] <= now < entry[2])
+        if is_active
+        else (entry for entry in entries if entry[1] > now),
+        key=lambda entry: entry[2] if is_active else entry[1],
+    )
+    heading = "\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078" if is_active else "\u3053\u308c\u304b\u3089\u53d7\u4ed8\u958b\u59cb\u306e\u62bd\u9078"
+    empty = "\u73fe\u5728\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078\u306f\u3042\u308a\u307e\u305b\u3093\u3002" if is_active else "\u73fe\u5728\u3001\u3053\u308c\u304b\u3089\u53d7\u4ed8\u958b\u59cb\u3068\u306a\u308b\u62bd\u9078\u306f\u3042\u308a\u307e\u305b\u3093\u3002"
     if not active:
-        return '<section class="current"><h2>\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078</h2><p class="empty">\u73fe\u5728\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078\u306f\u3042\u308a\u307e\u305b\u3093\u3002</p></section>'
+        return f'<section class="current {view}"><h2>{heading}</h2><p class="empty">{empty}</p></section>'
     cards = []
     for item, start, deadline in active:
         store = escape(item.get("store", "\u5e97\u8217\u540d\u4e0d\u660e"))
@@ -157,24 +161,24 @@ def _lottery_list(entries: list[tuple[dict, datetime, datetime]], now: datetime)
         new_mark = '<mark style="display:inline-block;margin:0 6px 6px 0;padding:2px 6px;border-radius:5px;background:#ef4444;color:#fff;font-size:.7rem;font-weight:900;vertical-align:middle;">NEW</mark>' if item.get("is_new") else ""
         conditions = item.get("conditions") or []
         condition_text = " / ".join(conditions) or "\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057"
-        condition_kind = "none" if not conditions else "member_only" if len(conditions) == 1 and "\u4f1a\u54e1" in conditions[0] else "other"
+        condition_kind = "none" if not conditions else "has_conditions"
         application = item.get("application_method", "unknown")
-        receipt = item.get("receipt_method", "unknown")
         labels = []
         if condition_kind == "none": labels.append("\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057")
-        elif condition_kind == "member_only": labels.append("\u4f1a\u54e1\u6761\u4ef6\u3042\u308a")
+        elif condition_kind == "has_conditions": labels.append("\u8ffd\u52a0\u6761\u4ef6\u3042\u308a")
         if application == "online": labels.append("Web\u5fdc\u52df")
         elif application == "store": labels.append("\u5e97\u982d\u5fdc\u52df")
-        if receipt == "delivery": labels.append("\u914d\u9001\u3042\u308a")
-        elif receipt == "store_pickup": labels.append("\u5e97\u982d\u53d7\u53d6")
-        tag_html = ''.join(f'<span class="tag">{escape(label)}</span>' for label in labels) or '<span class="tag muted">\u65b9\u6cd5\u3092\u78ba\u8a8d</span>'
+        tag_html = ''.join(f'<span class="tag">{escape(label)}</span>' for label in labels) or '<span class="tag muted">Web\u5fdc\u52df\u65b9\u6cd5\u306f\u8a73\u7d30\u3067\u78ba\u8a8d</span>'
+        url = escape(item.get("application_url", "#"), quote=True)
         cards.append(
-            f'<details id="lottery-{item_id}" class="lottery-card" style="{_store_style(item)}" data-condition="{condition_kind}" data-application="{application}" data-receipt="{receipt}">'
-            f'<summary><span class="store-name">\U0001f3ea {store}</span>{new_mark}<b>{title}</b><span class="period"><i>\U0001f4c5 \u958b\u59cb</i>{_date_time(start)}<em>\u2192</em><i>\u23f0 \u7de0\u5207</i>{_date_time(deadline)}</span><span class="condition-summary">\U0001f4cb <strong>\u5fdc\u52df\u6761\u4ef6</strong> {escape(condition_text)}</span></summary>'
-            f'<div class="tags">{tag_html}</div>{_detail(item, start, deadline)}</details>'
+            f'<article id="lottery-{item_id}" class="lottery-card" style="{_store_style(item)}" data-status="{view}" data-condition="{condition_kind}" data-application="{application}">'
+            f'<span class="store-name">\U0001f3ea {store}</span>{new_mark}<h3>{title}</h3><span class="period"><i>\U0001f4c5 \u958b\u59cb</i>{_date_time(start)}<em>\u2192</em><i>\u23f0 \u7de0\u5207</i>{_date_time(deadline)}</span><span class="condition-summary">\U0001f4cb <strong>\u5fdc\u52df\u6761\u4ef6</strong> {escape(condition_text)}</span>'
+            f'<div class="tags">{tag_html}</div><a class="apply-link" href="{url}" target="_blank" rel="noreferrer">\U0001f310 Web\u3067\u5fdc\u52df\u3059\u308b</a></article>'
         )
-    filters = '''<div class="filters"><label>\u6761\u4ef6<select id="condition-filter"><option value="all">\u3059\u3079\u3066</option><option value="none">\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057</option><option value="member_only">\u4f1a\u54e1\u6761\u4ef6\u3042\u308a</option></select></label><label>\u5fdc\u52df<select id="application-filter"><option value="all">\u3059\u3079\u3066</option><option value="online">Web\u30fb\u30a2\u30d7\u30ea</option><option value="store">\u5e97\u982d</option></select></label><label>\u53d7\u53d6<select id="receipt-filter"><option value="all">\u3059\u3079\u3066</option><option value="delivery">\u914d\u9001\u3042\u308a</option><option value="store_pickup">\u5e97\u982d\u53d7\u53d6</option></select></label></div>'''
-    return '<section class="current"><h2>\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078</h2><p class="sub">\u6761\u4ef6\u30fb\u5fdc\u52df\u65b9\u6cd5\u30fb\u53d7\u53d6\u65b9\u6cd5\u3067\u7d5e\u308c\u307e\u3059\u3002\u60c5\u5831\u5143\u306b\u660e\u8a18\u3055\u308c\u305f\u3082\u306e\u3060\u3051\u8868\u793a\u3057\u307e\u3059\u3002</p>' + filters + ''.join(cards) + '</section>'
+    filters = '''<div class="filters"><label>\u6761\u4ef6<select id="condition-filter"><option value="all">\u3059\u3079\u3066</option><option value="none">\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057</option><option value="has_conditions">\u8ffd\u52a0\u6761\u4ef6\u3042\u308a</option></select></label><label>Web\u5fdc\u52df<select id="application-filter"><option value="all">\u3059\u3079\u3066</option><option value="online">Web\u30fb\u30a2\u30d7\u30ea</option><option value="store">\u5e97\u982d</option></select></label></div>''' if is_active else ''
+    guidance = '\u6761\u4ef6\u30fb\u5fdc\u52df\u65b9\u6cd5\u30fb\u53d7\u53d6\u65b9\u6cd5\u3067\u7d5e\u308c\u307e\u3059\u3002\u60c5\u5831\u5143\u306b\u660e\u8a18\u3055\u308c\u305f\u3082\u306e\u3060\u3051\u8868\u793a\u3057\u307e\u3059\u3002' if is_active else '\u958b\u59cb\u65e5\u6642\u3092\u78ba\u8a8d\u6e08\u307f\u306e\u60c5\u5831\u3067\u3059\u3002\u958b\u59cb\u6642\u523b\u3092\u904e\u304e\u308b\u3068\u300c\u53d7\u4ed8\u4e2d\u306e\u62bd\u9078\u300d\u3078\u79fb\u308a\u307e\u3059\u3002'
+    card_styles = '<style>.lottery-card{padding:14px 15px 13px}.lottery-card h3{margin:3px 0 9px;font-size:1rem;line-height:1.45}.lottery-card .period{display:flex;flex-wrap:wrap;gap:5px;align-items:center;color:#374151;font-size:.82rem;margin:6px 0}.apply-link{display:block;margin-top:10px;padding:10px;text-align:center;text-decoration:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:800}</style>'
+    return card_styles + f'<section class="current {view}"><h2>{heading}</h2><p class="sub">{guidance}</p>{filters}' + ''.join(cards) + '</section>'
 
 
 def _pending_page(items: list[dict]) -> str:
@@ -248,7 +252,7 @@ def build_calendar(items: list[dict], destination: Path, timezone: str = "Asia/T
 .bar summary strong{{display:inline-block;margin-right:4px;padding:1px 4px;border-radius:4px;background:#ffffffa8;font-weight:800}}.bar{{background:var(--event);color:var(--event-text)}}.bar.pokemon,.bar.onepiece,.bar.other{{background:var(--event);color:var(--event-text)}}.new-badge{{display:inline-block;margin-right:4px;padding:1px 4px;border:0;border-radius:4px;background:#ef4444;color:#fff;font-size:.68rem;font-weight:900;vertical-align:1px}}
 .current{{margin:22px 0 34px}}.filters{{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}}.filters label{{display:grid;gap:3px;font-size:.78rem;color:#4b5563;font-weight:700}}.filters select{{border:1px solid #cbd5e1;border-radius:7px;background:#fff;padding:7px;color:#111827}}.lottery-card{{display:block;border:1px solid var(--event);border-left:7px solid var(--event-text);border-radius:12px;margin:12px 0;background:var(--event);box-shadow:0 2px 8px #0f172a0d}}.lottery-card summary{{cursor:pointer;list-style:none;padding:14px 15px 10px}}.lottery-card summary::-webkit-details-marker{{display:none}}.store-name{{display:block;margin-bottom:7px;color:var(--event-text);font-size:.9rem;font-weight:900}}.lottery-card summary b{{display:block;font-size:1rem;line-height:1.45;margin:3px 0 9px}}.lottery-card summary .period{{display:flex;flex-wrap:wrap;gap:5px;align-items:center;color:#374151;font-size:.82rem;margin:6px 0}}.period i{{font-style:normal;border-radius:5px;background:#ffffffbf;color:var(--event-text);font-weight:900;padding:3px 6px}}.period em{{font-style:normal;color:#6b7280;font-size:1rem}}.condition-summary{{display:block;padding:8px 9px;border-radius:7px;background:#fff9;border-left:3px solid #f59e0b;font-size:.82rem;line-height:1.45;max-height:3.25em;overflow:hidden}}.condition-summary strong{{color:#92400e}}.tags{{padding:0 15px 11px;display:flex;gap:5px;flex-wrap:wrap}}.tag{{font-size:.74rem;font-weight:800;padding:3px 7px;border-radius:99px;background:#ffffffc7;color:var(--event-text)}}.tag.muted{{color:#4b5563}}.lottery-card .detail{{margin:0 12px 12px}}.detail .condition-detail{{padding:8px;border-radius:7px;background:#fff7ed;font-weight:700}} 
 @media(max-width:650px){{main{{padding:16px 4px 30px}}h1{{padding:0 8px;font-size:1.35rem}}.sub{{padding:0 8px;font-size:.82rem}}h2{{padding:0 8px;font-size:1.05rem}}.weekdays{{font-size:.72rem}}.week{{min-height:108px;padding-top:6px}}.date{{padding:0 3px;font-size:.8rem}}.bar{{font-size:.61rem}}.bar summary{{padding:4px 3px}}.detail{{font-size:.78rem;min-width:205px}}}}
-</style></head><body><main><h1>\u30ab\u30fc\u30c9\u62bd\u9078\u30ab\u30ec\u30f3\u30c0\u30fc</h1><p class="sub">\u958b\u59cb\u65e5\u3068\u7d42\u4e86\u65e5\u304c\u78ba\u8a8d\u3067\u304d\u305f\u62bd\u9078\u3060\u3051\u3092\u63b2\u8f09\u3057\u307e\u3059\u3002</p>{_lottery_list(entries, now)}<h2>\u53d7\u4ed8\u671f\u9593\u30ab\u30ec\u30f3\u30c0\u30fc</h2>{body}</main><script>const target=document.querySelector(location.hash);if(target&&target.tagName==='DETAILS'){{target.open=true;setTimeout(()=>target.scrollIntoView({{block:'center'}}),0);}}const filters=[['condition-filter','condition'],['application-filter','application'],['receipt-filter','receipt']];function applyFilters(){{document.querySelectorAll('.lottery-card').forEach(card=>{{card.hidden=!filters.every(([id,key])=>{{const value=document.getElementById(id).value;return value==='all'||card.dataset[key]===value;}});}})}}filters.forEach(([id])=>document.getElementById(id).addEventListener('change',applyFilters));</script></body></html>'''
+</style></head><body><main><h1>\u30ab\u30fc\u30c9\u62bd\u9078\u30ab\u30ec\u30f3\u30c0\u30fc</h1><p class="sub">\u958b\u59cb\u65e5\u3068\u7d42\u4e86\u65e5\u304c\u78ba\u8a8d\u3067\u304d\u305f\u62bd\u9078\u3060\u3051\u3092\u63b2\u8f09\u3057\u307e\u3059\u3002</p>{_lottery_list(entries, now, "active")}{_lottery_list(entries, now, "upcoming")}<h2>\u53d7\u4ed8\u671f\u9593\u30ab\u30ec\u30f3\u30c0\u30fc</h2>{body}</main><script>const target=document.querySelector(location.hash);if(target&&target.tagName==='DETAILS'){{target.open=true;setTimeout(()=>target.scrollIntoView({{block:'center'}}),0);}}const filters=[['condition-filter','condition'],['application-filter','application'],['receipt-filter','receipt']];function applyFilters(){{document.querySelectorAll('.lottery-card').forEach(card=>{{if(card.dataset.status!=='active')return;card.hidden=!filters.every(([id,key])=>{{const value=document.getElementById(id).value;return value==='all'||card.dataset[key]===value;}});}})}}filters.forEach(([id])=>{{const select=document.getElementById(id);if(select){{select.addEventListener('change',applyFilters);}}}});</script></body></html>'''
     (destination / "index.html").write_text(page, encoding="utf-8")
     (destination / "pending.html").write_text(_pending_page(pending_items), encoding="utf-8")
     (destination / "lotteries.json").write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")
