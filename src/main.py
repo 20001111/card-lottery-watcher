@@ -86,6 +86,8 @@ def main():
     }
     collected = {}
     queued_for_review = 0
+    source_count = 0
+    extracted_count = 0
 
     headers = {"User-Agent": "CardLotteryWatcher/1.0 (+personal notification bot)"}
     detail_limit = int(config.get("official_detail_link_limit", 2))
@@ -96,6 +98,7 @@ def main():
         print(f"WARN X discovery: {exc}")
 
     for source in sources:
+        source_count += 1
         try:
             response = requests.get(source["url"], headers=headers, timeout=config.get("request_timeout_seconds", 20))
             response.raise_for_status()
@@ -115,6 +118,8 @@ def main():
                     max_chars=int(config.get("ai_page_max_chars", 18000)),
                 )
                 extracted = extract_with_ai(page_source, document, allowed_links, now, config)
+                extracted_count += len(extracted)
+                print(f"EXTRACTED {page_source['name']}: {len(extracted)} candidate(s)")
                 for raw in extracted:
                     if not raw.get("start_at") or not raw.get("deadline"):
                         if send_candidate(raw, page_source):
@@ -136,6 +141,8 @@ def main():
                         deadline=raw["deadline"],
                         start_at=raw.get("start_at"),
                         conditions=conditions,
+                        application_method=raw.get("application_method", "unknown"),
+                        receipt_method=raw.get("receipt_method", "unknown"),
                         source_kind=page_source.get("kind", "discovery"),
                         official_confirmed=page_source.get("kind") == "official" or bool(raw.get("official_confirmed")),
                     )
@@ -214,6 +221,10 @@ def main():
             send_review_queue_update(admin_webhook, queued_for_review, admin_dashboard_url)
         except Exception as exc:
             print(f"WARN Discord review-queue update: {exc}")
+    print(
+        f"SUMMARY sources={source_count} extracted={extracted_count} "
+        f"public={len(items)} new={len(new_items)} review_needed={queued_for_review}"
+    )
     return
 
     if not webhook:

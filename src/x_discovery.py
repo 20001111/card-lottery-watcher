@@ -45,7 +45,9 @@ def candidate_sources(settings: dict) -> list[dict]:
                 "name": f"X候補 @{author}" if author else "Xで見つけた候補",
                 "store_key": "x_candidate",
                 "kind": "discovery",
-                "category": "pokemon",
+                # The one API request covers both supported card games.  The
+                # AI decides the actual card type from the linked page.
+                "category": "both",
                 "url": url,
                 "x_post_id": post.get("id"),
                 "require_official_confirmation": settings.get("require_official_confirmation", True),

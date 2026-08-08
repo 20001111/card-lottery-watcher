@@ -21,7 +21,8 @@ official_detail_link_limit: 2
 x_discovery:
   enabled: true
   max_posts: 10
-  query: '"ポケカ" (抽選 OR 応募) has:links lang:ja -is:retweet -is:reply'
+  # ポケカとワンピースを、1回の検索でまとめて候補収集します。
+  query: '("ポケカ" OR "ポケモンカード" OR "ワンピースカード" OR "ONE PIECEカード") (抽選 OR 応募)'
   # These accounts are prioritized as leads, not trusted as proof. Their linked
   # pages must still contain a valid, future deadline before notification.
   priority_accounts:
@@ -31,6 +32,8 @@ x_discovery:
     - omusubicororiin
     - shiryuu8
     - pokecayoyaku
+    - onepiecenyuka
+    - gamegetnavi
   priority_minimum_ai_confidence: 0.75
   other_minimum_ai_confidence: 0.88
   require_official_confirmation: true
@@ -98,6 +101,16 @@ sources:
     kind: discovery
     category: pokemon
     url: https://pokecawatch.com/category/%E6%8A%BD%E9%81%B8%E3%83%BB%E4%BA%88%E7%B4%84%E6%83%85%E5%A0%B1
+  - name: ポケカ速報ブログ
+    store_key: pokeca_sokuho_blog
+    kind: discovery
+    category: pokemon
+    url: https://pokeca-sokuho.hatenablog.com/
+  - name: 人気トレカゲットナビ
+    store_key: gamegetnavi
+    kind: discovery
+    category: both
+    url: https://gamenv.net/tc/
   - name: Pokemon Card official news
     store_key: pokemon_card_official
     kind: official

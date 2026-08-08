@@ -41,7 +41,7 @@ def extract_with_ai(source: dict, document: str, allowed_links: set[str], now: d
     system = """あなたは日本のトレーディングカード抽選情報の検証担当です。
 ページ本文に明記された事実だけを使います。商品紹介、発売予定だけ、終了済み、予約ではない通常販売、大会情報は除外してください。
 現在応募受付中、または開始日時が明記された近日開始の抽選だけを抽出します。
-日付を推測しません。応募締切と応募先URLが明記されていないものは除外します。
+日付を推測しません。公開用の情報は応募締切と応募先URLが明記されたものだけにします。
 ポケモンカードとONE PIECEカードだけが対象です。URLを創作しません。
 購入履歴、会員登録期限、アプリ、本人確認、受取店舗などの条件を短く正確に残してください。
 JSON以外は出力しないでください。"""
@@ -59,7 +59,10 @@ JSON以外は出力しないでください。"""
   "deadline":"タイムゾーン付きISO 8601",
   "application_url":"本文のページ内リンクに存在する正式な応募・詳細URL",
   "requirements":["応募条件"],
+  "application_method":"online または store または unknown",
+  "receipt_method":"delivery または store_pickup または unknown",
   "evidence":"受付期間と抽選である根拠を短く記載",
+  "official_confirmed":true,
   "confidence":0.0
 }}]}}
 
@@ -75,6 +78,10 @@ the evidence states the dates and application conditions you found.
 If an actual application link exists but either start_at or deadline is missing,
 also include it as an unconfirmed candidate with that value set to null. Never
 invent dates. It will go to the private review dashboard, not the public site.
+application_method is about applying: online means a Web/app form can be used;
+store means the application itself requires visiting a store. receipt_method is
+about receiving the product: delivery means it is shipped; store_pickup means a
+visit is required after winning. Use unknown unless the page explicitly says it.
 """
     response = requests.post(
         API_URL,
@@ -111,6 +118,10 @@ invent dates. It will go to the private review dashboard, not the public site.
             continue
         if item.get("card_type") not in ("pokemon", "onepiece"):
             continue
+        if item.get("application_method") not in ("online", "store", "unknown"):
+            item["application_method"] = "unknown"
+        if item.get("receipt_method") not in ("delivery", "store_pickup", "unknown"):
+            item["receipt_method"] = "unknown"
         if source.get("require_official_confirmation") and item.get("official_confirmed") is not True:
             continue
         if source.get("require_official_confirmation") and not item.get("evidence"):

@@ -38,6 +38,8 @@ class Lottery:
     official_confirmed: bool = False
     eligibility: str = "unknown"
     eligibility_reasons: list[str] = field(default_factory=list)
+    application_method: str = "unknown"
+    receipt_method: str = "unknown"
     status: str = "open"
     discord_message_id: Optional[str] = None
     # Kept in state so the Website can show NEW for a full day, rather than
