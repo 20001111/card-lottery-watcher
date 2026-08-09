@@ -18,6 +18,15 @@ max_deadline_days: 45
 # Official announcement pages are followed only for the first matching details.
 # This keeps costs and requests small while allowing dates and conditions to be verified.
 official_detail_link_limit: 2
+# Discovery/summary sites are followed through a small set of their own
+# Pokémon or ONE PIECE summary pages. This finds more leads without scanning
+# every link (which would be slow and expensive).
+discovery_detail_link_limit: 3
+# A discovery run can store this many external application links as private
+# review leads. They are checked on their own pages in later production runs.
+discovery_lead_link_limit: 20
+# Do not let one large summary site consume the whole review queue.
+discovery_lead_per_source_limit: 3
 
 # X is optional. When enabled, the official API makes exactly one search request
 # per workflow run and retrieves at most 10 posts. Every linked page still goes

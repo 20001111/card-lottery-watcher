@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 from zoneinfo import ZoneInfo
 
 import requests
@@ -17,7 +17,7 @@ from .discord_notify import send_management_dashboard_update, send_review_queue_
 from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .moderation import suppressed_urls
-from .supabase_sync import sync_statuses
+from .supabase_sync import manual_review_sources, sync_statuses
 from .x_discovery import candidate_sources
 
 
@@ -74,15 +74,114 @@ def official_detail_urls(html: str, page_url: str, source: dict, limit: int) -> 
     return urls
 
 
+def discovery_detail_urls(html: str, page_url: str, source: dict, limit: int) -> list[str]:
+    """Choose current card-information pages from a discovery site's index.
+
+    Discovery sites are useful for finding leads, but their home pages are
+    usually too large for one AI check.  Follow only a few same-site category
+    or summary pages.  External links remain in the page document and are
+    still required before a lead can be saved.
+    """
+    terms = {
+        "pokemon": ("ポケモン", "ポケカ"),
+        "onepiece": ("one piece", "ワンピース"),
+        "both": ("ポケモン", "ポケカ", "one piece", "ワンピース"),
+    }.get(source.get("category"), ())
+    source_host = urlsplit(page_url).netloc.lower()
+    soup = BeautifulSoup(html, "html.parser")
+    urls: list[str] = []
+    for link in soup.find_all("a", href=True):
+        label = " ".join(link.get_text(" ", strip=True).split())
+        url = urljoin(page_url, link["href"])
+        haystack = f"{label} {url}".lower()
+        if (
+            not url.startswith("http")
+            or urlsplit(url).netloc.lower() != source_host
+            or url.rstrip("/") == page_url.rstrip("/")
+            or url in urls
+            or not any(term.lower() in haystack for term in terms)
+        ):
+            continue
+        urls.append(url)
+        if len(urls) >= limit:
+            break
+    return urls
+
+
+def discovery_outbound_links(html: str, page_url: str, source: dict, limit: int) -> list[tuple[str, str]]:
+    """Find likely application links without asking AI to interpret the index.
+
+    An aggregation page is a lead source, not proof.  We only retain external
+    links whose surrounding text mentions both a supported card game and an
+    entry-related word.  The link is then checked separately by AI on a later
+    production run before an officer can publish it.
+    """
+    card_terms = {
+        "pokemon": ("ポケモン", "ポケカ"),
+        "onepiece": ("one piece", "ワンピース"),
+        "both": ("ポケモン", "ポケカ", "one piece", "ワンピース"),
+    }.get(source.get("category"), ())
+    entry_terms = ("抽選", "応募", "予約", "販売")
+    blocked_hosts = (
+        "appollo.jp", "amazon.co.jp", "amazon.com", "amzn.to", "facebook.com", "threads.net",
+        "timeline.line.me", "lin.ee", "x.com", "twitter.com", "instagram.com", "youtube.com",
+        "rakuten.co.jp", "rakuten.ne.jp", "af.moshimo.com", "shopping.yahoo.co.jp", "t.co",
+        "wordpress.org", "fit-jp.com", "ebay.us", "aliexpress.com",
+    )
+    source_host = urlsplit(page_url).netloc.lower()
+    soup = BeautifulSoup(html, "html.parser")
+    page_scope = " ".join(
+        element.get_text(" ", strip=True)
+        for element in soup.find_all(["title", "h1", "h2"], limit=8)
+    ).lower()
+    scoped_card_page = any(term.lower() in page_scope for term in card_terms)
+    scoped_entry_page = any(term in page_scope for term in entry_terms)
+    results: list[tuple[str, str]] = []
+    for link in soup.find_all("a", href=True):
+        url = canonical_application_url(urljoin(page_url, link["href"]))
+        host = urlsplit(url).netloc.lower()
+        if (
+            not url.startswith("http")
+            or "." not in host
+            or host == source_host
+            or any(host == blocked or host.endswith(f".{blocked}") for blocked in blocked_hosts)
+        ):
+            continue
+        label = " ".join(link.get_text(" ", strip=True).split())
+        container = link.find_parent(["tr", "li", "p", "article", "section", "div"])
+        context = " ".join(container.get_text(" ", strip=True).split()) if container else label
+        haystack = f"{label} {context} {url}".lower()
+        local_card = any(term.lower() in haystack for term in card_terms)
+        local_entry = any(term in haystack for term in entry_terms)
+        # Individual summary pages often say only "こちら" next to a shop
+        # link. Their page title already establishes the card and lottery
+        # context, so accept those links after excluding ad/social domains.
+        if not ((local_card and local_entry) or (scoped_card_page and scoped_entry_page and (local_card or local_entry))):
+            continue
+        title = context if len(context) >= 8 else label
+        title = title[:180] or "内容確認待ちの応募URL"
+        if url not in {existing_url for existing_url, _ in results}:
+            results.append((url, title))
+        if len(results) >= limit:
+            break
+    return results
+
+
 def source_pages(source: dict, config: dict) -> list[tuple[dict, str]]:
-    """Fetch a source, following a small number of official detail links."""
+    """Fetch a source, following a small number of relevant detail pages."""
     timeout = config.get("request_timeout_seconds", 20)
     response = requests.get(source["url"], headers=HEADERS, timeout=timeout)
     response.raise_for_status()
-    if source.get("kind") != "official":
-        return [(source, response.text)]
-
-    detail_urls = official_detail_urls(response.text, source["url"], source, int(config.get("official_detail_link_limit", 2)))
+    if source.get("kind") == "official":
+        detail_urls = official_detail_urls(
+            response.text, source["url"], source, int(config.get("official_detail_link_limit", 2))
+        )
+    elif source.get("kind") == "discovery":
+        detail_urls = discovery_detail_urls(
+            response.text, source["url"], source, int(config.get("discovery_detail_link_limit", 3))
+        )
+    else:
+        detail_urls = []
     if not detail_urls:
         return [(source, response.text)]
     pages = []
@@ -125,10 +224,22 @@ def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, 
         sources.extend(candidate_sources(config.get("x_discovery", {})))
     except Exception as exc:
         print(f"WARN X discovery: {exc}")
+    try:
+        manual_sources = manual_review_sources()
+        sources.extend(manual_sources)
+        if manual_sources:
+            print(f"MANUAL REVIEW: {len(manual_sources)} URL(s) queued for AI extraction")
+    except Exception as exc:
+        print(f"WARN manual review sources: {exc}")
 
     collected: dict[str, Lottery] = {}
+    lead_budget = int(config.get("discovery_lead_link_limit", 20))
     queued = extracted_count = 0
     for source in sources:
+        source_lead_budget = (
+            min(lead_budget, int(config.get("discovery_lead_per_source_limit", 3)))
+            if source.get("kind") == "discovery" else 0
+        )
         try:
             for page_source, html in source_pages(source, config):
                 document, allowed_links = page_document(html, page_source["url"], max_chars=int(config.get("ai_page_max_chars", 18000)))
@@ -144,6 +255,31 @@ def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, 
                         item.status = "pending"
                         queued += 1
                     collected[item.id] = item
+                # Discovery pages can contain many useful links even when the
+                # AI cannot reliably describe every one from the long index.
+                # Save these as private leads first; their own pages are read
+                # by AI in a later production run.
+                if page_source.get("kind") == "discovery" and source_lead_budget > 0:
+                    for url, title in discovery_outbound_links(html, page_source["url"], page_source, source_lead_budget):
+                        lead = Lottery(
+                            id=lottery_identity("店舗確認待ち", title, url),
+                            title=title,
+                            category=page_source.get("category", "both"),
+                            store="店舗確認待ち",
+                            store_key=page_source.get("store_key", "discovery_lead"),
+                            source_url=page_source["url"],
+                            application_url=url,
+                            source_kind="lead",
+                            status="pending",
+                        )
+                        if any(canonical_application_url(item.application_url) == url for item in collected.values()):
+                            continue
+                        collected[lead.id] = lead
+                        queued += 1
+                        lead_budget -= 1
+                        source_lead_budget -= 1
+                        if lead_budget <= 0 or source_lead_budget <= 0:
+                            break
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")
     return collected, len(sources), extracted_count, queued

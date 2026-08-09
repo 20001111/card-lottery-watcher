@@ -19,6 +19,7 @@
 
   <section id="app" class="hidden">
     <section class="panel"><div class="row between"><div><h2>抽選一覧</h2><p id="who" class="sub"></p></div><div class="row"><button id="import" class="button secondary">現在のWebsiteから取り込む</button><button id="logout" class="button secondary">ログアウト</button></div></div><div id="message"></div><div class="stats"><div class="stat"><span>確認待ち</span><b id="pending-count">0</b></div><div class="stat"><span>公開中</span><b id="published-count">0</b></div><div class="stat"><span>非表示</span><b id="suppressed-count">0</b></div></div><div class="row filters"><label>表示 <select id="filter"><option value="all">すべて</option><option value="pending">確認待ち</option><option value="published">公開中</option><option value="suppressed">非表示</option></select></label><button id="refresh" class="button secondary">再読み込み</button></div></section>
+    <section class="panel"><h2>🔗 応募URLを追加</h2><p class="sub">URLだけで追加できます。同じ応募URLがないか確認してから、まず「確認待ち」に保存します。次回の本番収集でAIが店舗・日付・条件を補完し、幹部が確認して公開します。</p><div class="row"><input id="manual-url" class="input" type="url" placeholder="https://... 応募ページのURL"><label>カード <select id="manual-category"><option value="pokemon">ポケモン</option><option value="onepiece">ワンピース</option><option value="both">両方・不明</option></select></label><button id="add-manual" class="button">重複確認して確認待ちへ</button></div><div id="manual-message"></div></section>
     <section id="list"></section>
   </section>
 </main>
@@ -35,13 +36,23 @@
   const message = (text, type = 'info') => { $('message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
   const loginMessage = (text, type = 'info') => { $('login-message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
   const labels = { pending: '確認待ち', published: '公開中', suppressed: '非表示' };
-  let client, items = [];
+  let client, items = [], currentUser;
 
   function statusBadge(status) { return `<span class="label status-${status}">${labels[status]}</span>`; }
   function itemUrl(item) { return item.application_url || item.listing?.application_url || ''; }
   function displayListing(record) { return record.listing || {}; }
   function time(value) { return value ? new Date(value).toLocaleString('ja-JP', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }) : '未確認'; }
   function safe(value) { const span = document.createElement('span'); span.textContent = value || ''; return span.innerHTML; }
+  function canonicalUrl(value) {
+    try {
+      const url = new URL(value.trim());
+      url.hash = '';
+      [...url.searchParams.keys()].forEach(key => { if (/^(utm_|fbclid$|gclid$)/i.test(key)) url.searchParams.delete(key); });
+      url.search = [...url.searchParams.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([key, entry]) => `${encodeURIComponent(key)}=${encodeURIComponent(entry)}`).join('&');
+      url.pathname = url.pathname.replace(/\/$/, '');
+      return url.toString();
+    } catch (_) { return ''; }
+  }
   function storeName(record) { return String(displayListing(record).store || '店舗未確認').trim(); }
   function deadlineTime(record) {
     const value = Date.parse(displayListing(record).deadline || '');
@@ -91,6 +102,22 @@
     if (error) { message(`保存に失敗しました：${safe(error.message)}`, 'error'); return false; }
     await load(); message('保存しました。', 'ok'); return true;
   }
+  async function addManualUrl() {
+    const url = canonicalUrl($('manual-url').value);
+    if (!url) throw new Error('https:// から始まる応募ページのURLを入力してください。');
+    const duplicate = items.find(item => canonicalUrl(itemUrl(item)) === url);
+    if (duplicate) {
+      $('manual-message').innerHTML = `<div class="notice info">このURLはすでに${statusBadge(duplicate.status)}として登録済みです。新しく追加せず、一覧から内容を確認してください。</div>`;
+      return;
+    }
+    const now = new Date().toISOString();
+    const listing = { title: '内容確認待ちの応募URL', store: '店舗未確認', category: $('manual-category').value, store_key: 'manual_submission', source_url: url, application_url: url, source_kind: 'manual', official_confirmed: false, conditions: [], start_at: null, deadline: null, application_method: 'unknown', receipt_method: 'unknown' };
+    const { error } = await client.from('lottery_listings').insert({ application_url: url, listing, status: 'pending', note: '管理画面からURLを追加。AI確認待ち。', submitted_by: currentUser?.email || null, created_at: now, updated_at: now });
+    if (error) throw error;
+    $('manual-url').value = '';
+    $('manual-message').innerHTML = '<div class="notice ok">確認待ちに追加しました。次回の本番収集でAIが内容を補完します。重複がある場合は追加されません。</div>';
+    await load();
+  }
   async function importWebsite() {
     const response = await fetch('./lotteries.json', { cache: 'no-store' });
     if (!response.ok) throw new Error('Websiteの抽選データを取得できませんでした。');
@@ -126,7 +153,7 @@
     client = window.supabase.createClient(config.url, config.anonKey);
     const { data: { session } } = await client.auth.getSession();
     if (!session) { show('login'); return; }
-    const { data: { user } } = await client.auth.getUser();
+    const { data: { user } } = await client.auth.getUser(); currentUser = user;
     hide('login'); show('app'); $('who').textContent = `${user.email} としてログイン中`; await load();
   }
 
@@ -138,6 +165,7 @@
   $('logout').addEventListener('click', async () => { await client.auth.signOut(); location.reload(); });
   $('refresh').addEventListener('click', load); $('filter').addEventListener('change', () => { render(); addEditForms(); });
   $('import').addEventListener('click', async () => { try { $('import').disabled = true; await importWebsite(); } catch(error) { message(`取込に失敗しました：${safe(error.message)}`, 'error'); } finally { $('import').disabled = false; } });
+  $('add-manual').addEventListener('click', async () => { try { $('add-manual').disabled = true; await addManualUrl(); } catch(error) { $('manual-message').innerHTML = `<div class="notice error">追加に失敗しました：${safe(error.message)}</div>`; } finally { $('add-manual').disabled = false; } });
   $('list').addEventListener('click', async (event) => {
     const button = event.target.closest('button[data-action]'); if (!button) return;
     const card = button.closest('.listing'), url = card.dataset.url, action = button.dataset.action;

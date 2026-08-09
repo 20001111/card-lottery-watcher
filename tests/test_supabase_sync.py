@@ -1,5 +1,7 @@
 from src.models import Lottery
-from src.supabase_sync import build_sync_rows
+from unittest.mock import patch
+
+from src.supabase_sync import build_sync_rows, manual_review_sources
 
 
 def test_sync_rows_preserve_existing_staff_status_and_memo():
@@ -43,3 +45,28 @@ def test_sync_rows_keep_officer_micro_corrections():
     row = build_sync_rows([item], {"https://shop.example/entry": {"overrides": {"title": "Correct title", "region": "関東"}}})[0]
     assert row["listing"]["title"] == "Correct title"
     assert row["listing"]["region"] == "関東"
+
+
+def test_manual_review_sources_include_only_pending_dashboard_urls(monkeypatch):
+    monkeypatch.setenv("SUPABASE_URL", "https://project.example")
+    monkeypatch.setenv("SUPABASE_SECRET_KEY", "secret")
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return [
+                {"application_url": "https://shop.example/entry/?utm_source=discord", "listing": {"source_kind": "manual", "category": "pokemon"}},
+                {"application_url": "https://shop.example/auto", "listing": {"source_kind": "discovery"}},
+            ]
+
+    with patch("src.supabase_sync.requests.get", return_value=Response()):
+        sources = manual_review_sources()
+    assert sources == [{
+        "name": "確認待ちの応募URL",
+        "store_key": "manual_submission",
+        "kind": "manual",
+        "category": "pokemon",
+        "url": "https://shop.example/entry",
+    }]

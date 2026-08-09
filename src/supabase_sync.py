@@ -32,6 +32,47 @@ def _endpoint() -> str:
     return os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/lottery_listings"
 
 
+def manual_review_sources(limit: int = 20) -> list[dict]:
+    """Return staff-submitted URLs that should be fact-checked by AI.
+
+    Officers can submit only an application URL in the private dashboard.  A
+    later production collection visits that URL and fills title, store, dates,
+    and conditions before anyone publishes it. Pending rows remain private;
+    published staff entries are also revisited so they stay in the public
+    collection on the next scheduled rebuild.
+    """
+    if not configured():
+        return []
+    response = requests.get(
+        _endpoint(),
+        params={
+            "select": "application_url,listing",
+            "status": "in.(pending,published)",
+            "order": "created_at.asc",
+            "limit": str(limit),
+        },
+        headers=_headers(),
+        timeout=20,
+    )
+    response.raise_for_status()
+    sources = []
+    for row in response.json():
+        listing = row.get("listing") or {}
+        url = canonical_application_url(row.get("application_url", ""))
+        if not url or listing.get("source_kind") not in {"manual", "lead"}:
+            continue
+        sources.append(
+            {
+                "name": "確認待ちの応募URL",
+                "store_key": "manual_submission",
+                "kind": "manual",
+                "category": listing.get("category") or "both",
+                "url": url,
+            }
+        )
+    return sources
+
+
 def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list[dict]:
     """Prepare rows while preserving a staff decision and its memo."""
     rows = []
