@@ -18,6 +18,7 @@ from .discord_notify import send_management_dashboard_update, send_review_queue_
 from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .moderation import suppressed_urls
+from .supabase_sync import sync_statuses
 from .x_discovery import candidate_sources
 
 
@@ -203,7 +204,11 @@ def publish(items: list[Lottery], calendar_items: list[dict], config: dict) -> N
 def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, publish_public: bool) -> None:
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
     daily = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
-    if webhook and (new_items or daily):
+    # Production always reports where the refreshed Website can be opened.
+    # This includes a manual production run with zero new items; otherwise it
+    # looks as though the update did not happen. Development stays quiet when
+    # no candidate was found, avoiding needless test-channel messages.
+    if webhook and (publish_public or new_items or daily):
         send_site_update(
             webhook,
             len(new_items),
@@ -231,8 +236,26 @@ def main() -> None:
     items = prepare_items(collected, old_by_url, config)
     new_items, started_items, calendar_items = mark_new_and_started(items, old_by_url, now)
     publish_public = os.getenv("PUBLISH_PUBLIC", "true").lower() == "true"
+    # A staff member decides which listings are public.  The saved crawler
+    # state still keeps all candidates, so they remain available in the admin
+    # dashboard instead of disappearing after one collection run. Development
+    # runs deliberately do not change the real approval queue.
+    try:
+        statuses = sync_statuses(items) if publish_public else None
+    except Exception as exc:
+        # Do not replace the Website with an empty page if Supabase is down.
+        # The next run will retry and the previous published Website remains.
+        print(f"WARN Supabase sync: {exc}")
+        statuses = None
+    if statuses is None:
+        public_calendar_items = calendar_items
+    else:
+        public_calendar_items = [
+            item for item in calendar_items
+            if statuses.get(canonical_application_url(item.get("application_url", ""))) == "published"
+        ]
     if publish_public:
-        publish(items, calendar_items, config)
+        publish(items, public_calendar_items, config)
     notify(new_items, started_items, queued, publish_public)
     print(f"SUMMARY sources={source_count} extracted={extracted_count} public={len(items)} new={len(new_items)} started={len(started_items)} review_needed={queued}")
 

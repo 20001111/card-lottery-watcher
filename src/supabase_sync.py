@@ -1,0 +1,85 @@
+"""Synchronise lottery review decisions with Supabase.
+
+Supabase is the source of truth for an officer's publish / pending / suppress
+decision.  The collector may update the facts of a listing, but it must never
+silently overwrite that decision.
+"""
+
+from __future__ import annotations
+
+import os
+from typing import Iterable
+
+import requests
+
+from .models import Lottery, canonical_application_url
+
+
+def configured() -> bool:
+    return bool(os.getenv("SUPABASE_URL") and os.getenv("SUPABASE_SECRET_KEY"))
+
+
+def _headers() -> dict[str, str]:
+    key = os.environ["SUPABASE_SECRET_KEY"]
+    return {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+
+
+def _endpoint() -> str:
+    return os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/lottery_listings"
+
+
+def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list[dict]:
+    """Prepare rows while preserving a staff decision and its memo."""
+    rows = []
+    for item in items:
+        url = canonical_application_url(item.application_url)
+        if not url:
+            continue
+        before = existing.get(url, {})
+        listing = item.to_dict()
+        listing["application_url"] = url
+        overrides = before.get("overrides") or {}
+        for field in ("title", "store", "start_at", "deadline", "conditions", "region"):
+            if field in overrides:
+                listing[field] = overrides[field]
+        rows.append(
+            {
+                "application_url": url,
+                "listing": listing,
+                # New discoveries require approval. Existing decisions win.
+                "status": before.get("status", "pending"),
+                "overrides": overrides,
+                "note": before.get("note", ""),
+            }
+        )
+    return rows
+
+
+def sync_statuses(items: Iterable[Lottery]) -> dict[str, str] | None:
+    """Upsert collected listings and return their current publication states.
+
+    ``None`` means that Supabase is not configured; this keeps the old
+    Website behaviour until the secret is added to GitHub Actions.
+    """
+    if not configured():
+        return None
+
+    endpoint = _endpoint()
+    headers = _headers()
+    response = requests.get(endpoint, params={"select": "application_url,status,note,overrides"}, headers=headers, timeout=20)
+    response.raise_for_status()
+    existing = {
+        canonical_application_url(row["application_url"]): row
+        for row in response.json()
+        if row.get("application_url")
+    }
+    rows = build_sync_rows(items, existing)
+    if rows:
+        upsert_headers = {**headers, "Prefer": "resolution=merge-duplicates"}
+        response = requests.post(endpoint, params={"on_conflict": "application_url"}, headers=upsert_headers, json=rows, timeout=20)
+        response.raise_for_status()
+    return {row["application_url"]: row["status"] for row in rows}

@@ -22,6 +22,7 @@
     <section id="list"></section>
   </section>
 </main>
+<style>.edit{margin-top:13px;padding-top:10px;border-top:1px solid #dbe3ef}.edit summary{cursor:pointer;font-weight:800;color:#1d4ed8}.edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.edit-grid label{display:grid;gap:4px;font-size:.82rem;font-weight:700}.edit-grid label:last-child{grid-column:1/-1}@media(max-width:560px){.edit-grid{grid-template-columns:1fr}}</style>
 <script src="./admin-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -55,10 +56,23 @@
     }).join('') : '<div class="panel empty">この分類の抽選はありません。</div>';
   }
 
+  function addEditForms() {
+    document.querySelectorAll('.listing').forEach(card => {
+      const record = items.find(item => item.application_url === card.dataset.url);
+      if (!record) return;
+      const listing = displayListing(record);
+      const conditions = Array.isArray(listing.conditions) ? listing.conditions.join('\n') : '';
+      const details = document.createElement('details');
+      details.className = 'edit';
+      details.innerHTML = `<summary>✏️ 内容を微修正</summary><div class="edit-grid"><label>店舗<input data-field="store" class="input" value="${safe(listing.store || '')}"></label><label>商品・抽選名<input data-field="title" class="input" value="${safe(listing.title || '')}"></label><label>開始<input data-field="start_at" class="input" type="datetime-local" value="${safe((listing.start_at || '').slice(0,16))}"></label><label>締切<input data-field="deadline" class="input" type="datetime-local" value="${safe((listing.deadline || '').slice(0,16))}"></label><label>地域<input data-field="region" class="input" placeholder="例：関東 / 全国" value="${safe(listing.region || '')}"></label><label>応募条件（1行ずつ）<textarea data-field="conditions">${safe(conditions)}</textarea></label></div><button class="button secondary" data-action="save-listing">修正を保存</button>`;
+      card.querySelector('.actions').before(details);
+    });
+  }
+
   async function load() {
     const { data, error } = await client.from('lottery_listings').select('*').order('updated_at', { ascending: false });
     if (error) { message(`読み込みに失敗しました：${safe(error.message)}`, 'error'); return; }
-    items = data; render();
+    items = data; render(); addEditForms();
   }
   async function update(url, patch) {
     const { error } = await client.from('lottery_listings').update({ ...patch, updated_at: new Date().toISOString() }).eq('application_url', url);
@@ -69,7 +83,28 @@
     const response = await fetch('./lotteries.json', { cache: 'no-store' });
     if (!response.ok) throw new Error('Websiteの抽選データを取得できませんでした。');
     const lotteries = await response.json();
-    const rows = lotteries.filter(item => item.application_url).map(listing => ({ application_url: listing.application_url, listing, status: listing.status === 'open' ? 'published' : 'pending', updated_at: new Date().toISOString() }));
+    // Import refreshes the source details only.  It must never overwrite an
+    // officer's existing publish / pending / suppressed decision or memo.
+    const { data: existing, error: existingError } = await client
+      .from('lottery_listings')
+      .select('application_url,status,note,created_at,submitted_by');
+    if (existingError) throw existingError;
+    const saved = new Map(existing.map(item => [item.application_url, item]));
+    const now = new Date().toISOString();
+    const rows = lotteries.filter(item => item.application_url).map(listing => {
+      const previous = saved.get(listing.application_url);
+      return {
+        application_url: listing.application_url,
+        listing,
+        // Existing Website entries were imported once as published.  Anything
+        // discovered afterwards starts in the approval queue.
+        status: previous?.status || 'pending',
+        note: previous?.note || '',
+        submitted_by: previous?.submitted_by || null,
+        created_at: previous?.created_at || now,
+        updated_at: now
+      };
+    });
     const { error } = await client.from('lottery_listings').upsert(rows, { onConflict: 'application_url' });
     if (error) throw error;
     await load(); message(`${rows.length}件を取り込みました。`, 'ok');
@@ -89,12 +124,24 @@
     loginMessage(error ? `送信に失敗しました：${safe(error.message)}` : 'メールを送りました。届いたリンクを開いてください。', error ? 'error' : 'ok');
   });
   $('logout').addEventListener('click', async () => { await client.auth.signOut(); location.reload(); });
-  $('refresh').addEventListener('click', load); $('filter').addEventListener('change', render);
+  $('refresh').addEventListener('click', load); $('filter').addEventListener('change', () => { render(); addEditForms(); });
   $('import').addEventListener('click', async () => { try { $('import').disabled = true; await importWebsite(); } catch(error) { message(`取込に失敗しました：${safe(error.message)}`, 'error'); } finally { $('import').disabled = false; } });
   $('list').addEventListener('click', async (event) => {
     const button = event.target.closest('button[data-action]'); if (!button) return;
     const card = button.closest('.listing'), url = card.dataset.url, action = button.dataset.action;
     if (action === 'save-note') return update(url, { note: card.querySelector('[data-note]').value });
+    if (action === 'save-listing') {
+      const record = items.find(item => item.application_url === url), listing = { ...(record?.listing || {}) };
+      const overrides = { ...(record?.overrides || {}) };
+      card.querySelectorAll('[data-field]').forEach(field => {
+        let value = field.value.trim();
+        if (field.dataset.field === 'conditions') value = value ? value.split(/\n+/).map(line => line.trim()).filter(Boolean) : [];
+        if (field.dataset.field === 'start_at' || field.dataset.field === 'deadline') value = value ? `${value}:00+09:00` : null;
+        listing[field.dataset.field] = value;
+        overrides[field.dataset.field] = value;
+      });
+      return update(url, { listing, overrides });
+    }
     if (action === 'suppress' && !confirm('この抽選を非表示にしますか？')) return;
     const status = action === 'restore' || action === 'publish' ? 'published' : action === 'pending' ? 'pending' : 'suppressed';
     await update(url, { status });

@@ -11,11 +11,17 @@ create table if not exists public.lottery_listings (
   listing jsonb not null,
   status text not null default 'pending'
     check (status in ('pending', 'published', 'suppressed')),
+  -- Officer corrections survive later AI collection updates.
+  overrides jsonb not null default '{}'::jsonb,
   note text not null default '',
   submitted_by text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Safe to run again after the initial table was created.
+alter table public.lottery_listings
+  add column if not exists overrides jsonb not null default '{}'::jsonb;
 
 create or replace function public.is_lottery_admin()
 returns boolean

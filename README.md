@@ -74,3 +74,11 @@ python -m src.main
 - ページ本文の転載ではなく、必要な要約と元ページへのリンクを掲載する
 - 誤情報や日付不足の候補は、承認前には公開しない
 - 情報源ごとの利用条件とrobots.txtを尊重する
+# Card lottery watcher
+
+## 公開・承認の運用
+
+- 自動で見つかった新しい抽選は、Supabase上では最初に**承認待ち**になります。
+- 幹部用の `admin.html` で **公開する** を押したものだけ、次回の本番更新（毎日9時、または production 手動実行）でWebsiteへ掲載されます。
+- **非表示にする** を押したものは、次回更新でWebsiteから外れます。状態とメモは自動収集で上書きされません。
+- GitHub Actions の Secrets に `SUPABASE_SECRET_KEY` を追加するまでは、従来どおり全件をWebsiteへ出す安全な互換動作です。

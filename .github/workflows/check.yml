@@ -41,6 +41,8 @@ jobs:
           ADMIN_DISCORD_WEBHOOK_URL: ${{ secrets.ADMIN_DISCORD_WEBHOOK_URL }}
           ADMIN_DASHBOARD_URL: https://20001111.github.io/card-lottery-watcher/admin.html
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
+          SUPABASE_URL: https://ziuuxvcomyhnrleoecdq.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           # Development runs are a notification/collection test only.  They
           # must not replace the public Website or its saved new-item state.
           PUBLISH_PUBLIC: ${{ (github.event_name == 'schedule' || inputs.notification_target == 'production') && 'true' || 'false' }}
