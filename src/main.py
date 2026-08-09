@@ -17,6 +17,7 @@ from .discord_notify import send_management_dashboard_update, send_review_queue_
 from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .moderation import suppressed_urls
+from .supabase_sync import configured as supabase_configured
 from .supabase_sync import manual_review_sources, sync_statuses
 from .x_discovery import candidate_sources
 
@@ -371,13 +372,21 @@ def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, 
 def main() -> None:
     config = load_config()
     now = datetime.now(ZoneInfo(config.get("timezone", "Asia/Tokyo")))
+    publish_public = os.getenv("PUBLISH_PUBLIC", "true").lower() == "true"
+    # Approval is the safety gate for the public Website.  Do not spend ten
+    # minutes collecting data only to silently discard the review queue when
+    # the server-side Supabase key has not been registered in GitHub yet.
+    if publish_public and not supabase_configured():
+        raise RuntimeError(
+            "Supabase同期が未設定です。GitHub ActionsのRepository secret "
+            "SUPABASE_SECRET_KEY にSupabaseのservice_role keyを登録してください。"
+        )
     old = load_state()
     old_by_url = notification_index(old)
     collected, source_count, extracted_count, queued = collect(config, now)
     retain_open_previous(collected, old, now)
     items = prepare_items(collected, old_by_url, config)
     new_items, started_items, calendar_items = mark_new_and_started(items, old_by_url, now)
-    publish_public = os.getenv("PUBLISH_PUBLIC", "true").lower() == "true"
     # A staff member decides which listings are public.  The saved crawler
     # state still keeps all candidates, so they remain available in the admin
     # dashboard instead of disappearing after one collection run. Development
