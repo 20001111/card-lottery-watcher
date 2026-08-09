@@ -214,9 +214,10 @@ def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, 
         )
     if admin_webhook := os.getenv("ADMIN_DISCORD_WEBHOOK_URL"):
         dashboard_url = os.getenv("ADMIN_DASHBOARD_URL")
-        if daily:
-            send_management_dashboard_update(admin_webhook, dashboard_url, queued)
-        elif queued:
+        # The private management channel receives its dashboard link on every run,
+        # including manual development checks. This makes webhook setup testable.
+        send_management_dashboard_update(admin_webhook, dashboard_url, queued)
+        if queued and not daily:
             send_review_queue_update(admin_webhook, queued, dashboard_url)
 
 
