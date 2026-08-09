@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from .admin_queue import send_candidate
 from .ai_extract import extract_with_ai, page_document
 from .calendar import build_calendar
-from .discord_notify import send_review_queue_update, send_site_update
+from .discord_notify import send_management_dashboard_update, send_review_queue_update, send_site_update
 from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .moderation import suppressed_urls
@@ -202,17 +202,22 @@ def publish(items: list[Lottery], calendar_items: list[dict], config: dict) -> N
 
 def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, publish_public: bool) -> None:
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
-    if webhook and (new_items or os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"):
+    daily = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
+    if webhook and (new_items or daily):
         send_site_update(
             webhook,
             len(new_items),
             os.getenv("CALENDAR_URL"),
-            daily=os.getenv("DAILY_SITE_UPDATE", "").lower() == "true",
+            daily=daily,
             development=not publish_public,
             started_count=len(started_items),
         )
-    if queued and (admin_webhook := os.getenv("ADMIN_DISCORD_WEBHOOK_URL")):
-        send_review_queue_update(admin_webhook, queued, os.getenv("ADMIN_DASHBOARD_URL"))
+    if admin_webhook := os.getenv("ADMIN_DISCORD_WEBHOOK_URL"):
+        dashboard_url = os.getenv("ADMIN_DASHBOARD_URL")
+        if daily:
+            send_management_dashboard_update(admin_webhook, dashboard_url, queued)
+        elif queued:
+            send_review_queue_update(admin_webhook, queued, dashboard_url)
 
 
 def main() -> None:

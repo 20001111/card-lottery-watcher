@@ -106,3 +106,15 @@ def send_review_queue_update(webhook_url: str, count: int, dashboard_url: str | 
     response = requests.post(webhook_url, params={"wait": "true"}, json={"content": message}, timeout=20)
     response.raise_for_status()
     return response.json()["id"]
+
+
+def send_management_dashboard_update(webhook_url: str, dashboard_url: str | None, review_count: int = 0):
+    """Send one daily operations link to the private management channel."""
+    message = "\U0001f6e0\ufe0f \u672c\u65e5\u306e\u7ba1\u7406\u7528\u30da\u30fc\u30b8\u3067\u3059\u3002"
+    if review_count:
+        message += f"\n\n\u26a0\ufe0f \u65e5\u4ed8\u306a\u3069\u306e\u78ba\u8a8d\u5f85\u3061\u304c{review_count}\u4ef6\u3042\u308a\u307e\u3059\u3002"
+    if dashboard_url:
+        message += f"\n\n\U0001f517 \u975e\u63b2\u8f09\u30fb\u5fa9\u5143\u30fb\u78ba\u8a8d\u306f\u3053\u3061\u3089\n{dashboard_url}"
+    response = requests.post(webhook_url, params={"wait": "true"}, json={"content": message}, timeout=20)
+    response.raise_for_status()
+    return response.json()["id"]
