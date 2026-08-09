@@ -3,19 +3,104 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>抽選情報・管理用</title>
+  <title>カード抽選 管理画面</title>
   <style>
-    :root{--ink:#172033;--muted:#64748b;--line:#dbe3ef;--blue:#2563eb;--red:#b91c1c;--green:#15803d}
-    *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-    main{max-width:720px;margin:auto;padding:28px 16px 48px}h1{margin:0 0 7px;font-size:1.45rem}.sub{color:var(--muted);line-height:1.6}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px;box-shadow:0 2px 12px #1720330c}.panel h2{margin:0 0 9px;font-size:1.05rem}.panel p,.panel li{line-height:1.65}
-    .button{display:block;text-align:center;margin-top:14px;padding:12px;background:var(--blue);border-radius:9px;color:#fff;text-decoration:none;font-weight:800}.tag{display:inline-block;border-radius:99px;padding:3px 8px;font-size:.78rem;font-weight:800}.hide{color:var(--red);background:#fef2f2}.restore{color:var(--green);background:#f0fdf4}code{display:block;overflow-wrap:anywhere;background:#f1f5f9;padding:8px;border-radius:6px}
+    :root{--ink:#172033;--muted:#64748b;--line:#dbe3ef;--blue:#2563eb;--green:#15803d;--red:#b91c1c;--amber:#b45309;--paper:#fff;--bg:#f4f7fb}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:980px;margin:auto;padding:28px 16px 52px}h1{margin:0;font-size:1.65rem}h2{font-size:1.05rem;margin:0}.sub{color:var(--muted);line-height:1.65}.panel,.listing{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px;box-shadow:0 2px 12px #1720330b}.hidden{display:none!important}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.login{max-width:520px;margin:42px auto}.input,select,textarea{border:1px solid #b9c7da;border-radius:9px;padding:10px 12px;font:inherit;background:#fff}.input{width:min(100%,360px)}textarea{width:100%;min-height:62px;resize:vertical}.button{border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--blue);color:#fff}.button.secondary{background:#e8eef9;color:#1e3a70}.button.warning{background:#fff7ed;color:var(--amber);border:1px solid #fed7aa}.button.danger{background:#fef2f2;color:var(--red);border:1px solid #fecaca}.button:disabled{opacity:.55;cursor:not-allowed}.notice{border-radius:10px;padding:12px 14px;line-height:1.55;margin-top:14px}.notice.info{background:#eff6ff;color:#1e3a8a}.notice.error{background:#fef2f2;color:#991b1b}.notice.ok{background:#f0fdf4;color:#166534}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px}.stat b{display:block;font-size:1.35rem}.filters{margin-top:16px}.listing{border-left:6px solid #94a3b8}.listing[data-status="published"]{border-left-color:var(--green)}.listing[data-status="pending"]{border-left-color:var(--amber)}.listing[data-status="suppressed"]{border-left-color:var(--red)}.label{display:inline-block;border-radius:99px;padding:3px 9px;font-size:.78rem;font-weight:800;background:#e2e8f0}.status-published{color:#166534;background:#dcfce7}.status-pending{color:#92400e;background:#fef3c7}.status-suppressed{color:#991b1b;background:#fee2e2}.title{font-size:1.08rem;font-weight:800;line-height:1.5;margin:10px 0 5px}.meta{font-size:.9rem;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}.url{display:block;margin-top:8px;overflow-wrap:anywhere;color:#1d4ed8}.actions{margin-top:14px}.note-label{display:block;font-size:.86rem;font-weight:700;margin:14px 0 6px}.empty{padding:32px;text-align:center;color:var(--muted)}@media(max-width:560px){main{padding:20px 12px}.stats{grid-template-columns:1fr}.button{width:100%}.row .button{width:auto}.between{align-items:flex-start}}
   </style>
 </head>
-<body><main>
-  <h1>抽選情報・管理用</h1>
-  <p class="sub">幹部Discordの通知から開く、非掲載・復元のための管理ページです。操作できるのは、GitHubリポジトリの書き込み権限がある人だけです。</p>
-  <section class="panel"><h2>① 応募先URLをコピー</h2><p>公開Websiteの各抽選カード下部にある「🔗 応募先URL」をコピーします。</p><code>https://.../application-page</code></section>
-  <section class="panel"><h2>② 操作を選ぶ</h2><p><span class="tag hide">suppress</span> 間違い・重複・掲載停止にする抽選</p><p><span class="tag restore">restore</span> 間違えて止めた抽選を戻す</p><a class="button" href="https://github.com/20001111/card-lottery-watcher/actions/workflows/moderate.yml">管理操作を開く</a></section>
-  <section class="panel"><h2>③ GitHubで実行</h2><ol><li>右上の <b>Run workflow</b> を押す</li><li><b>action</b> で <code>suppress</code> または <code>restore</code> を選ぶ</li><li><b>application_url</b> にコピーしたURLを貼る</li><li>緑の <b>Run workflow</b> を押す</li></ol><p class="sub">完了すると、Websiteのデータと表示が自動で更新されます。非掲載にしたURLは翌朝の自動収集でも戻りません。</p></section>
-</main></body></html>
+<body>
+<main>
+  <header class="row between"><div><h1>🛠️ カード抽選 管理画面</h1><p class="sub">幹部専用。抽選を1件ずつ確認し、公開・確認待ち・非表示・復元を管理します。</p></div><a class="button secondary" href="./">公開Websiteを見る</a></header>
+
+  <section id="setup" class="panel hidden"><h2>接続設定が必要です</h2><p class="sub">SupabaseのPublishable keyを <code>docs/admin-config.js</code> に入れると、管理画面が使えるようになります。</p></section>
+
+  <section id="login" class="panel login hidden"><h2>幹部ログイン</h2><p class="sub">登録済みメールアドレスへログイン用リンクを送ります。</p><input id="email" class="input" type="email" autocomplete="email" placeholder="メールアドレス"><button id="send-link" class="button">ログインリンクを送る</button><div id="login-message"></div></section>
+
+  <section id="app" class="hidden">
+    <section class="panel"><div class="row between"><div><h2>抽選一覧</h2><p id="who" class="sub"></p></div><div class="row"><button id="import" class="button secondary">現在のWebsiteから取り込む</button><button id="logout" class="button secondary">ログアウト</button></div></div><div id="message"></div><div class="stats"><div class="stat"><span>確認待ち</span><b id="pending-count">0</b></div><div class="stat"><span>公開中</span><b id="published-count">0</b></div><div class="stat"><span>非表示</span><b id="suppressed-count">0</b></div></div><div class="row filters"><label>表示 <select id="filter"><option value="all">すべて</option><option value="pending">確認待ち</option><option value="published">公開中</option><option value="suppressed">非表示</option></select></label><button id="refresh" class="button secondary">再読み込み</button></div></section>
+    <section id="list"></section>
+  </section>
+</main>
+<script src="./admin-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  const config = window.LOTTERY_ADMIN_CONFIG || {};
+  const configured = config.url && config.anonKey && !config.anonKey.includes('PASTE_');
+  const $ = (id) => document.getElementById(id);
+  const show = (id) => $(id).classList.remove('hidden');
+  const hide = (id) => $(id).classList.add('hidden');
+  const message = (text, type = 'info') => { $('message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
+  const loginMessage = (text, type = 'info') => { $('login-message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
+  const labels = { pending: '確認待ち', published: '公開中', suppressed: '非表示' };
+  let client, items = [];
+
+  function statusBadge(status) { return `<span class="label status-${status}">${labels[status]}</span>`; }
+  function itemUrl(item) { return item.application_url || item.listing?.application_url || ''; }
+  function displayListing(record) { return record.listing || {}; }
+  function time(value) { return value ? new Date(value).toLocaleString('ja-JP', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }) : '未確認'; }
+  function safe(value) { const span = document.createElement('span'); span.textContent = value || ''; return span.innerHTML; }
+
+  function render() {
+    const filter = $('filter').value;
+    const visible = filter === 'all' ? items : items.filter(item => item.status === filter);
+    $('pending-count').textContent = items.filter(item => item.status === 'pending').length;
+    $('published-count').textContent = items.filter(item => item.status === 'published').length;
+    $('suppressed-count').textContent = items.filter(item => item.status === 'suppressed').length;
+    $('list').innerHTML = visible.length ? visible.map(record => {
+      const listing = displayListing(record), url = itemUrl(record);
+      const action = record.status === 'suppressed' ? '<button class="button" data-action="restore">復元して公開</button>' : '<button class="button danger" data-action="suppress">非表示にする</button>';
+      return `<article class="listing" data-status="${record.status}" data-url="${safe(url)}"><div class="row between">${statusBadge(record.status)}<span class="meta">更新 ${time(record.updated_at)}</span></div><div class="title">${safe(listing.title || '名称未確認')}</div><div class="meta">🏪 ${safe(listing.store || '店舗未確認')}　📅 開始 ${time(listing.start_at)}　⏰ 締切 ${time(listing.deadline)}</div>${url ? `<a class="url" target="_blank" rel="noreferrer" href="${safe(url)}">🔗 応募先URL</a>` : ''}<label class="note-label">管理メモ</label><textarea data-note>${safe(record.note || '')}</textarea><div class="row actions">${action}<button class="button secondary" data-action="pending">確認待ちにする</button><button class="button secondary" data-action="publish">公開する</button><button class="button secondary" data-action="save-note">メモを保存</button></div></article>`;
+    }).join('') : '<div class="panel empty">この分類の抽選はありません。</div>';
+  }
+
+  async function load() {
+    const { data, error } = await client.from('lottery_listings').select('*').order('updated_at', { ascending: false });
+    if (error) { message(`読み込みに失敗しました：${safe(error.message)}`, 'error'); return; }
+    items = data; render();
+  }
+  async function update(url, patch) {
+    const { error } = await client.from('lottery_listings').update({ ...patch, updated_at: new Date().toISOString() }).eq('application_url', url);
+    if (error) { message(`保存に失敗しました：${safe(error.message)}`, 'error'); return false; }
+    await load(); message('保存しました。', 'ok'); return true;
+  }
+  async function importWebsite() {
+    const response = await fetch('./lotteries.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Websiteの抽選データを取得できませんでした。');
+    const lotteries = await response.json();
+    const rows = lotteries.filter(item => item.application_url).map(listing => ({ application_url: listing.application_url, listing, status: listing.status === 'open' ? 'published' : 'pending', updated_at: new Date().toISOString() }));
+    const { error } = await client.from('lottery_listings').upsert(rows, { onConflict: 'application_url' });
+    if (error) throw error;
+    await load(); message(`${rows.length}件を取り込みました。`, 'ok');
+  }
+  async function start() {
+    if (!configured) { show('setup'); return; }
+    client = window.supabase.createClient(config.url, config.anonKey);
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) { show('login'); return; }
+    const { data: { user } } = await client.auth.getUser();
+    hide('login'); show('app'); $('who').textContent = `${user.email} としてログイン中`; await load();
+  }
+
+  $('send-link').addEventListener('click', async () => {
+    const email = $('email').value.trim(); if (!email) return loginMessage('メールアドレスを入力してください。', 'error');
+    const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href } });
+    loginMessage(error ? `送信に失敗しました：${safe(error.message)}` : 'メールを送りました。届いたリンクを開いてください。', error ? 'error' : 'ok');
+  });
+  $('logout').addEventListener('click', async () => { await client.auth.signOut(); location.reload(); });
+  $('refresh').addEventListener('click', load); $('filter').addEventListener('change', render);
+  $('import').addEventListener('click', async () => { try { $('import').disabled = true; await importWebsite(); } catch(error) { message(`取込に失敗しました：${safe(error.message)}`, 'error'); } finally { $('import').disabled = false; } });
+  $('list').addEventListener('click', async (event) => {
+    const button = event.target.closest('button[data-action]'); if (!button) return;
+    const card = button.closest('.listing'), url = card.dataset.url, action = button.dataset.action;
+    if (action === 'save-note') return update(url, { note: card.querySelector('[data-note]').value });
+    if (action === 'suppress' && !confirm('この抽選を非表示にしますか？')) return;
+    const status = action === 'restore' || action === 'publish' ? 'published' : action === 'pending' ? 'pending' : 'suppressed';
+    await update(url, { status });
+  });
+  start();
+})();
+</script>
+</body>
+</html>
