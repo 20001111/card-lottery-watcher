@@ -1,0 +1,36 @@
+name: Manage lottery listings
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "\u63b2\u8f09\u3092\u6b62\u3081\u308b\u304b\u3001\u5fa9\u5143\u3059\u308b\u304b"
+        required: true
+        type: choice
+        options:
+          - suppress
+          - restore
+      application_url:
+        description: "\u5fdc\u52df\u5148URL\uff08Website\u306e\u300c\u5fdc\u52df\u5148URL\u300d\u3092\u305d\u306e\u307e\u307e\u8cbc\u308a\u4ed8\u3051\uff09"
+        required: true
+        type: string
+
+jobs:
+  manage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Apply moderator decision
+        run: python -m src.moderation "${{ inputs.action }}" "${{ inputs.application_url }}"
+      - name: Save Website and moderator decision
+        run: |
+          git config user.name "lottery-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/moderation.json data/lotteries.json docs/
+          git diff --cached --quiet || git commit -m "Manage lottery listing"
+          git push

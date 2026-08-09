@@ -39,7 +39,7 @@ jobs:
           ADMIN_QUEUE_URL: ${{ secrets.ADMIN_QUEUE_URL }}
           ADMIN_QUEUE_KEY: ${{ secrets.ADMIN_QUEUE_KEY }}
           ADMIN_DISCORD_WEBHOOK_URL: ${{ secrets.ADMIN_DISCORD_WEBHOOK_URL }}
-          ADMIN_DASHBOARD_URL: https://card-lottery-ops.tkt-1234.chatgpt.site
+          ADMIN_DASHBOARD_URL: https://20001111.github.io/card-lottery-watcher/admin.html
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
           # Development runs are a notification/collection test only.  They
           # must not replace the public Website or its saved new-item state.
