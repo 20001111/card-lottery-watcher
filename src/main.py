@@ -423,12 +423,13 @@ def main() -> None:
     retain_open_previous(collected, old, now)
     items = prepare_items(collected, old_by_url, config)
     new_items, started_items, calendar_items = mark_new_and_started(items, old_by_url, now)
-    # A staff member decides which listings are public.  The saved crawler
-    # state still keeps all candidates, so they remain available in the admin
-    # dashboard instead of disappearing after one collection run. Development
-    # runs deliberately do not change the real approval queue.
+    # A staff member decides which listings are public.  Every run, including
+    # a development check, saves new candidates to Supabase as ``pending``.
+    # Development must be useful for collection testing; only the public
+    # Website and the production Discord channel are protected by
+    # ``publish_public`` below.
     try:
-        statuses = sync_statuses(items, now) if publish_public else None
+        statuses = sync_statuses(items, now) if supabase_configured() else None
     except Exception as exc:
         # Do not replace the Website with an empty page if Supabase is down.
         # The next run will retry and the previous published Website remains.
