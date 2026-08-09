@@ -18,6 +18,26 @@ def test_new_sync_rows_start_pending():
     assert build_sync_rows([item], {})[0]["status"] == "pending"
 
 
+def test_incomplete_later_scan_does_not_erase_staff_confirmed_dates():
+    item = Lottery("id", "Lottery", "pokemon", "Shop", "shop", "https://source.example", "https://shop.example/entry")
+    existing = {
+        "https://shop.example/entry": {
+            "status": "published",
+            "listing": {
+                "title": "Confirmed lottery",
+                "store": "Confirmed shop",
+                "start_at": "2026-08-10T10:00:00+09:00",
+                "deadline": "2026-08-12T23:59:00+09:00",
+                "conditions": ["Membership required"],
+            },
+        }
+    }
+    row = build_sync_rows([item], existing)[0]
+    assert row["status"] == "published"
+    assert row["listing"]["start_at"] == "2026-08-10T10:00:00+09:00"
+    assert row["listing"]["deadline"] == "2026-08-12T23:59:00+09:00"
+
+
 def test_sync_rows_keep_officer_micro_corrections():
     item = Lottery("id", "AI title", "pokemon", "AI shop", "shop", "https://source.example", "https://shop.example/entry")
     row = build_sync_rows([item], {"https://shop.example/entry": {"overrides": {"title": "Correct title", "region": "関東"}}})[0]

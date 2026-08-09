@@ -11,7 +11,6 @@ import requests
 import yaml
 from bs4 import BeautifulSoup
 
-from .admin_queue import send_candidate
 from .ai_extract import extract_with_ai, page_document
 from .calendar import build_calendar
 from .discord_notify import send_management_dashboard_update, send_review_queue_update, send_site_update
@@ -95,6 +94,12 @@ def source_pages(source: dict, config: dict) -> list[tuple[dict, str]]:
 
 
 def lottery_from_raw(raw: dict, source: dict) -> Lottery:
+    """Convert every AI candidate with an application link into one record.
+
+    A missing date is not a reason to lose a useful lead.  It remains a
+    ``pending`` record in the staff dashboard until an officer fills in the
+    missing facts and approves it.
+    """
     url = raw["application_url"]
     return Lottery(
         id=lottery_identity(raw["store"], raw["title"], url, raw.get("deadline")),
@@ -104,7 +109,7 @@ def lottery_from_raw(raw: dict, source: dict) -> Lottery:
         store_key=source.get("store_key", "unknown"),
         source_url=source["url"],
         application_url=url,
-        deadline=raw["deadline"],
+        deadline=raw.get("deadline"),
         start_at=raw.get("start_at"),
         conditions=list(raw.get("requirements") or []),
         application_method=raw.get("application_method", "unknown"),
@@ -131,11 +136,13 @@ def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, 
                 extracted_count += len(extracted)
                 print(f"EXTRACTED {page_source['name']}: {len(extracted)} candidate(s)")
                 for raw in extracted:
-                    if not raw.get("start_at") or not raw.get("deadline"):
-                        if send_candidate(raw, page_source):
-                            queued += 1
-                        continue
+                    # The AI extractor only returns an actual page link.  Keep
+                    # incomplete candidates too: staff can correct the dates
+                    # in the dashboard, publish them, or reject them.
                     item = lottery_from_raw(raw, page_source)
+                    if not raw.get("start_at") or not raw.get("deadline"):
+                        item.status = "pending"
+                        queued += 1
                     collected[item.id] = item
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")
@@ -204,11 +211,10 @@ def publish(items: list[Lottery], calendar_items: list[dict], config: dict) -> N
 def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, publish_public: bool) -> None:
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
     daily = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
-    # Production always reports where the refreshed Website can be opened.
-    # This includes a manual production run with zero new items; otherwise it
-    # looks as though the update did not happen. Development stays quiet when
-    # no candidate was found, avoiding needless test-channel messages.
-    if webhook and (publish_public or new_items or daily):
+    # A manual development run is an explicit test request, so it must always
+    # acknowledge completion even when the scan finds zero new listings.
+    # Production reports its refreshed Website in the same way.
+    if webhook:
         send_site_update(
             webhook,
             len(new_items),

@@ -116,3 +116,20 @@ sources:
     kind: official
     category: pokemon
     url: https://www.pokemon-card.com/info/
+  # These are leads, not proof: every extracted entry must still have a live
+  # application URL and an explicit period before it can be published.
+  - name: ポケチュー 抽選情報まとめ
+    store_key: pokechuu
+    kind: discovery
+    category: pokemon
+    url: https://pokechuu.com/
+  - name: ポケカピコ 抽選カレンダー
+    store_key: pokecafun
+    kind: discovery
+    category: both
+    url: https://pokecafun.com/
+  - name: 抽選Now カード情報
+    store_key: chusen_now
+    kind: discovery
+    category: both
+    url: https://chusen-now.com/

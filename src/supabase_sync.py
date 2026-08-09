@@ -41,6 +41,15 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list
             continue
         before = existing.get(url, {})
         listing = item.to_dict()
+        # Do not downgrade a staff-reviewed listing when a later scan finds
+        # the same URL but cannot read a date or condition from the page.
+        # Missing crawler facts should stay available for review, not erase
+        # previously confirmed facts.
+        previous_listing = before.get("listing") or {}
+        for field in ("title", "store", "deadline", "start_at", "conditions"):
+            value = listing.get(field)
+            if (value is None or value == "" or value == []) and previous_listing.get(field):
+                listing[field] = previous_listing[field]
         listing["application_url"] = url
         overrides = before.get("overrides") or {}
         for field in ("title", "store", "start_at", "deadline", "conditions", "region"):
