@@ -19,8 +19,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "f5e3140be6162c575062",
@@ -42,8 +47,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "a31d1725778f1113a627",
@@ -65,8 +75,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "17ca617d5c61132e874d",
@@ -88,8 +103,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "5717cf11a595fb1c3bc5",
@@ -111,8 +131,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "98a8a8efc515a9eb3f73",
@@ -134,8 +159,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "c4bcab71ca90757f3f04",
@@ -157,8 +187,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "17c7c4536a16bee8ad69",
@@ -180,8 +215,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "a008564aa157b82b1974",
@@ -203,8 +243,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "58d4ed01e373fb44747b",
@@ -226,8 +271,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "68f5e5fea936a0e0160e",
@@ -248,8 +298,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "26f76282a639fa399aa7",
@@ -270,8 +325,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "f7264327240c653ca57d",
@@ -292,8 +352,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "ac6c82f21efb6964aa37",
@@ -314,8 +379,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "e50153a2d7f4e63438b2",
@@ -336,8 +406,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "0f674fc168f9d7290fd7",
@@ -358,8 +433,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "2ffd4e61e5e8b7392fb8",
@@ -380,8 +460,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "d99311cf13a7d4a2bee0",
@@ -402,8 +487,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "92fa9fb2fcedc8902403",
@@ -424,92 +514,13 @@
     "eligibility_reasons": [
       "アプリを要確認"
     ],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "b851b428213b51127a31",
-    "title": "ポケモンカード ストームエメラルダ／メガブレイブ／メガシンフォニア／スタートデッキ100 バトルコレクション 抽選（ポケモンカード）",
-    "category": "pokemon",
-    "store": "カードボックス オーサカ店",
-    "store_key": "cardchusen",
-    "source_url": "https://cardchusen.com/",
-    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=97dS8GLi4T",
-    "deadline": "2026-08-08T23:59:00+09:00",
-    "start_at": null,
-    "conditions": [
-      "オンライン",
-      "会員"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "defab06542746f5dd17f",
-    "title": "世界最強の戦士 抽選（ONE PIECEカード）",
-    "category": "onepiece",
-    "store": "JUMP SHOP各店",
-    "store_key": "cardchusen",
-    "source_url": "https://cardchusen.com/",
-    "application_url": "https://jumpshop-benelic.com/pages/about-enter-shop",
-    "deadline": "2026-08-08T23:59:00+09:00",
-    "start_at": null,
-    "conditions": [
-      "オンライン",
-      "SNS応募"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "4005e10261104ecf6cb6",
-    "title": "ポケモンカード ストームエメラルダ / メガブレイブ / メガシンフォニア / スタートデッキ100 バトルコレクション — カードボックス オーサカ店 抽選",
-    "category": "pokemon",
-    "store": "カードボックス オーサカ店",
-    "store_key": "cardchusen",
-    "source_url": "https://cardchusen.com/",
-    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=97dS8GLi4T",
-    "deadline": "2026-08-08T23:59:00+09:00",
-    "start_at": null,
-    "conditions": [
-      "オンライン",
-      "会員"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
-  },
-  {
-    "id": "d965b9170b3ef3d89b3b",
-    "title": "世界最強の戦士 — JUMP SHOP各店 抽選",
-    "category": "onepiece",
-    "store": "JUMP SHOP各店",
-    "store_key": "cardchusen",
-    "source_url": "https://cardchusen.com/",
-    "application_url": "https://jumpshop-benelic.com/pages/about-enter-shop",
-    "deadline": "2026-08-08T23:59:00+09:00",
-    "start_at": null,
-    "conditions": [
-      "オンライン",
-      "SNS応募"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "b3d04dae4abede29614c",
@@ -529,8 +540,13 @@
     "official_confirmed": false,
     "eligibility": "unknown",
     "eligibility_reasons": [],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": null,
+    "is_new": false
   },
   {
     "id": "4b908792c0b505c58396",
@@ -550,8 +566,13 @@
     "official_confirmed": false,
     "eligibility": "unknown",
     "eligibility_reasons": [],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": null,
+    "is_new": false
   },
   {
     "id": "8fa4eb7d5f9c8c047d16",
@@ -570,8 +591,13 @@
     "official_confirmed": false,
     "eligibility": "unknown",
     "eligibility_reasons": [],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "bab80dba9fd67fe25b5a",
@@ -588,8 +614,13 @@
     "official_confirmed": false,
     "eligibility": "unknown",
     "eligibility_reasons": [],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "a17390f8e743b67959b6",
@@ -606,7 +637,12 @@
     "official_confirmed": false,
     "eligibility": "unknown",
     "eligibility_reasons": [],
+    "application_method": "unknown",
+    "receipt_method": "unknown",
     "status": "open",
-    "discord_message_id": null
+    "discord_message_id": null,
+    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   }
 ]
