@@ -42,10 +42,22 @@
   function displayListing(record) { return record.listing || {}; }
   function time(value) { return value ? new Date(value).toLocaleString('ja-JP', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }) : '未確認'; }
   function safe(value) { const span = document.createElement('span'); span.textContent = value || ''; return span.innerHTML; }
+  function storeName(record) { return String(displayListing(record).store || '店舗未確認').trim(); }
+  function deadlineTime(record) {
+    const value = Date.parse(displayListing(record).deadline || '');
+    return Number.isNaN(value) ? Number.POSITIVE_INFINITY : value;
+  }
+  function sortForReview(records) {
+    return [...records].sort((left, right) => {
+      const storeOrder = storeName(left).localeCompare(storeName(right), 'ja');
+      return storeOrder || deadlineTime(left) - deadlineTime(right)
+        || String(displayListing(left).title || '').localeCompare(String(displayListing(right).title || ''), 'ja');
+    });
+  }
 
   function render() {
     const filter = $('filter').value;
-    const visible = filter === 'all' ? items : items.filter(item => item.status === filter);
+    const visible = sortForReview(filter === 'all' ? items : items.filter(item => item.status === filter));
     $('pending-count').textContent = items.filter(item => item.status === 'pending').length;
     $('published-count').textContent = items.filter(item => item.status === 'published').length;
     $('suppressed-count').textContent = items.filter(item => item.status === 'suppressed').length;

@@ -1,6 +1,9 @@
 from dataclasses import asdict, dataclass, field
+from difflib import SequenceMatcher
 import hashlib
+import re
 from typing import Iterable, Optional
+import unicodedata
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
@@ -85,52 +88,93 @@ def _first_value(items: list[Lottery], field_name: str, unknown: str = "unknown"
     return getattr(max(items, key=_quality), field_name)
 
 
+def _comparison_text(value: str) -> str:
+    """Make harmless title variations comparable without translating content."""
+    text = unicodedata.normalize("NFKC", value or "").lower()
+    # The same ONE PIECE lottery is often written once in English and once in
+    # Japanese by separate sources.
+    text = re.sub(r"one\s*piece", "ワンピース", text)
+    return re.sub(r"[\s\W_]+", "", text)
+
+
+def _same_semantic_lottery(left: Lottery, right: Lottery) -> bool:
+    """Recognise the same listing when sources provide different entry URLs.
+
+    URL equality is the strongest signal.  This fallback is deliberately
+    conservative: it requires the same store, card category, and *both*
+    timestamps before accepting a near-identical title.
+    """
+    if not (left.start_at and left.deadline and right.start_at and right.deadline):
+        return False
+    if (
+        _comparison_text(left.store) != _comparison_text(right.store)
+        or left.category != right.category
+        or left.start_at != right.start_at
+        or left.deadline != right.deadline
+    ):
+        return False
+    # Sources often append the store name in parentheses to the title.  The
+    # store is already compared above, so it must not prevent a merge.
+    left_title = _comparison_text(left.title).replace(_comparison_text(left.store), "")
+    right_title = _comparison_text(right.title).replace(_comparison_text(right.store), "")
+    return SequenceMatcher(None, left_title, right_title).ratio() >= 0.88
+
+
+def _merge_group(group: list[Lottery]) -> Lottery:
+    """Keep the richest record while retaining fields gathered by other sources."""
+    ranked = sorted(group, key=_quality, reverse=True)
+    best = ranked[0]
+    conditions: list[str] = []
+    for item in ranked:
+        for condition in item.conditions:
+            cleaned = " ".join(condition.split())
+            if cleaned and cleaned not in conditions:
+                conditions.append(cleaned)
+
+    first_seen = [item.first_seen_at for item in group if item.first_seen_at]
+    start_notified = [item.start_notified_at for item in group if item.start_notified_at]
+    message_ids = [item.discord_message_id for item in ranked if item.discord_message_id]
+    category = _first_value(ranked, "category")
+    if category == "unknown":
+        category = best.category
+    return Lottery(
+        id=lottery_identity(best.store, best.title, best.application_url, best.deadline),
+        title=best.title,
+        category=category,
+        store=best.store,
+        store_key=best.store_key,
+        source_url=best.source_url,
+        application_url=best.application_url,
+        deadline=_first_value(ranked, "deadline", ""),
+        start_at=_first_value(ranked, "start_at", ""),
+        conditions=conditions,
+        source_kind=best.source_kind,
+        official_confirmed=any(item.official_confirmed for item in group),
+        eligibility=best.eligibility,
+        eligibility_reasons=best.eligibility_reasons,
+        application_method=_first_value(ranked, "application_method"),
+        receipt_method=_first_value(ranked, "receipt_method"),
+        status=best.status,
+        discord_message_id=message_ids[0] if message_ids else None,
+        first_seen_at=min(first_seen) if first_seen else None,
+        start_notified_at=min(start_notified) if start_notified else None,
+    )
+
+
 def deduplicate_lotteries(items: Iterable[Lottery]) -> list[Lottery]:
-    """Merge source variations so one application URL is shown once."""
-    groups: dict[str, list[Lottery]] = {}
+    """Merge duplicate URLs and conservative same-lottery source variations."""
+    url_groups: dict[str, list[Lottery]] = {}
     for item in items:
         key = canonical_application_url(item.application_url) or f"missing:{item.id}"
-        groups.setdefault(key, []).append(item)
+        url_groups.setdefault(key, []).append(item)
 
-    merged: list[Lottery] = []
-    for group in groups.values():
-        ranked = sorted(group, key=_quality, reverse=True)
-        best = ranked[0]
-        conditions: list[str] = []
-        for item in ranked:
-            for condition in item.conditions:
-                cleaned = " ".join(condition.split())
-                if cleaned and cleaned not in conditions:
-                    conditions.append(cleaned)
-
-        first_seen = [item.first_seen_at for item in group if item.first_seen_at]
-        start_notified = [item.start_notified_at for item in group if item.start_notified_at]
-        message_ids = [item.discord_message_id for item in ranked if item.discord_message_id]
-        category = _first_value(ranked, "category")
-        if category == "unknown":
-            category = best.category
-        merged.append(
-            Lottery(
-                id=lottery_identity(best.store, best.title, best.application_url, best.deadline),
-                title=best.title,
-                category=category,
-                store=best.store,
-                store_key=best.store_key,
-                source_url=best.source_url,
-                application_url=best.application_url,
-                deadline=_first_value(ranked, "deadline", ""),
-                start_at=_first_value(ranked, "start_at", ""),
-                conditions=conditions,
-                source_kind=best.source_kind,
-                official_confirmed=any(item.official_confirmed for item in group),
-                eligibility=best.eligibility,
-                eligibility_reasons=best.eligibility_reasons,
-                application_method=_first_value(ranked, "application_method"),
-                receipt_method=_first_value(ranked, "receipt_method"),
-                status=best.status,
-                discord_message_id=message_ids[0] if message_ids else None,
-                first_seen_at=min(first_seen) if first_seen else None,
-                start_notified_at=min(start_notified) if start_notified else None,
-            )
-        )
-    return merged
+    groups: list[list[Lottery]] = []
+    for url_group in url_groups.values():
+        representative = _merge_group(url_group)
+        for group in groups:
+            if _same_semantic_lottery(representative, _merge_group(group)):
+                group.extend(url_group)
+                break
+        else:
+            groups.append(list(url_group))
+    return [_merge_group(group) for group in groups]
