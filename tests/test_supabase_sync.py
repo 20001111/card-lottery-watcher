@@ -23,6 +23,21 @@ def test_new_sync_rows_start_pending():
     assert build_sync_rows([item], {})[0]["status"] == "pending"
 
 
+def test_sync_rows_merge_same_application_url_before_upsert():
+    first = Lottery(
+        "first", "Short title", "pokemon", "Shop", "shop", "https://source.example",
+        "https://shop.example/entry?utm_source=one",
+    )
+    richer = Lottery(
+        "second", "Complete title", "pokemon", "Shop", "shop", "https://source.example",
+        "https://shop.example/entry?utm_source=two", "2026-08-10T23:59:00+09:00", "2026-08-01T10:00:00+09:00",
+    )
+    rows = build_sync_rows([first, richer], {})
+    assert len(rows) == 1
+    assert rows[0]["application_url"] == "https://shop.example/entry"
+    assert rows[0]["listing"]["title"] == "Complete title"
+
+
 def test_incomplete_later_scan_does_not_erase_staff_confirmed_dates():
     item = Lottery("id", "Lottery", "pokemon", "Shop", "shop", "https://source.example", "https://shop.example/entry")
     existing = {

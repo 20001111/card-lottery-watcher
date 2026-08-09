@@ -135,9 +135,22 @@ def _expired(listing: dict, now: datetime | None) -> bool:
         return False
 
 
+def _listing_quality(listing: dict) -> int:
+    """Prefer the most complete version when sources share one entry URL."""
+    fields = ("title", "store", "start_at", "deadline", "conditions", "region")
+    score = sum(bool(listing.get(field)) for field in fields)
+    if listing.get("source_kind") == "official":
+        score += 1
+    return score
+
+
 def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: datetime | None = None) -> list[dict]:
     """Prepare rows while preserving a staff decision and its memo."""
-    rows = []
+    # PostgREST rejects an upsert payload that contains the same conflict key
+    # more than once.  A source can describe the exact same application URL
+    # with slightly different titles, so enforce URL uniqueness here as the
+    # final safety net after crawler-level deduplication.
+    rows_by_url: dict[str, dict] = {}
     for item in items:
         url = canonical_application_url(item.application_url)
         if not url:
@@ -163,17 +176,18 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: da
         # from the public Website once their deadline passes.
         if current_status == "published" and _expired(listing, now):
             current_status = "expired"
-        rows.append(
-            {
-                "application_url": url,
-                "listing": listing,
-                # New discoveries require approval. Existing decisions win.
-                "status": current_status,
-                "overrides": overrides,
-                "note": before.get("note", ""),
-            }
-        )
-    return rows
+        row = {
+            "application_url": url,
+            "listing": listing,
+            # New discoveries require approval. Existing decisions win.
+            "status": current_status,
+            "overrides": overrides,
+            "note": before.get("note", ""),
+        }
+        previous_row = rows_by_url.get(url)
+        if previous_row is None or _listing_quality(listing) > _listing_quality(previous_row["listing"]):
+            rows_by_url[url] = row
+    return list(rows_by_url.values())
 
 
 def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict[str, str] | None:
