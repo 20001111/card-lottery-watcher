@@ -38,6 +38,12 @@ def extract_with_ai(source: dict, document: str, allowed_links: set[str], now: d
         raise RuntimeError("OPENAI_API_KEY is required for AI extraction")
     max_days = int(config.get("max_deadline_days", 45))
     minimum_confidence = float(source.get("minimum_ai_confidence", config.get("minimum_ai_confidence", 0.75)))
+    # A lead with a real application link but missing dates is useful to the
+    # officers. It is never published automatically, so it may use a lower
+    # confidence threshold than a fully verified public listing.
+    candidate_minimum_confidence = float(
+        source.get("candidate_minimum_ai_confidence", config.get("candidate_minimum_ai_confidence", 0.45))
+    )
     system = """あなたは日本のトレーディングカード抽選情報の検証担当です。
 ページ本文に明記された事実だけを使います。商品紹介、発売予定だけ、終了済み、予約ではない通常販売、大会情報は除外してください。
 現在応募受付中、または開始日時が明記された近日開始の抽選だけを抽出します。
@@ -116,6 +122,11 @@ visit is required after winning. Use unknown unless the page explicitly says it.
         url = item.get("application_url")
         if not url or (url not in allowed_links and url != source["url"]):
             continue
+        # An aggregation page is a clue, not an application page. Requiring
+        # one of its outbound links prevents many different candidates from
+        # collapsing into the same source URL in the review dashboard.
+        if source.get("kind") == "discovery" and url == source["url"]:
+            continue
         if item.get("card_type") not in ("pokemon", "onepiece"):
             continue
         if item.get("application_method") not in ("online", "store", "unknown"):
@@ -126,7 +137,9 @@ visit is required after winning. Use unknown unless the page explicitly says it.
             continue
         if source.get("require_official_confirmation") and not item.get("evidence"):
             continue
-        if float(item.get("confidence", 0)) < minimum_confidence:
+        incomplete = not item.get("start_at") or not item.get("deadline")
+        threshold = candidate_minimum_confidence if incomplete else minimum_confidence
+        if float(item.get("confidence", 0)) < threshold:
             continue
         valid.append(item)
     return valid

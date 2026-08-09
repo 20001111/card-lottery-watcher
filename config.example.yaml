@@ -10,6 +10,10 @@ ai_page_max_chars: 18000
 ai_request_timeout_seconds: 45
 ai_model: gpt-5-mini
 minimum_ai_confidence: 0.75
+# Leads with an application URL but missing a start date or deadline go only
+# to the private approval queue. Keeping this lower than the public threshold
+# helps staff find and complete information without publishing guesses.
+candidate_minimum_ai_confidence: 0.45
 max_deadline_days: 45
 # Official announcement pages are followed only for the first matching details.
 # This keeps costs and requests small while allowing dates and conditions to be verified.
