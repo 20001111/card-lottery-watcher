@@ -1,16 +1,29 @@
 from dataclasses import asdict, dataclass, field
 import hashlib
-from typing import Optional
+from typing import Iterable, Optional
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
-def lottery_identity(store: str, title: str, application_url: str, deadline: Optional[str] = None) -> str:
-    """Produce a stable ID across reposts and tracking-link variants."""
+def canonical_application_url(application_url: str) -> str:
+    """Normalize an application URL without losing meaningful query values."""
     parsed = urlsplit(application_url)
-    query = urlencode(sorted((key, value) for key, value in parse_qsl(parsed.query) if not key.lower().startswith(("utm_", "fbclid", "gclid"))))
-    canonical_url = urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/"), query, ""))
-    text = "|".join((" ".join(store.lower().split()), " ".join(title.lower().split()), canonical_url, (deadline or "")[:10]))
-    return hashlib.sha256(text.encode()).hexdigest()[:20]
+    query = urlencode(
+        sorted(
+            (key, value)
+            for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+            if not key.lower().startswith(("utm_", "fbclid", "gclid"))
+        )
+    )
+    return urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/"), query, ""))
+
+
+def lottery_identity(store: str, title: str, application_url: str, deadline: Optional[str] = None) -> str:
+    """Produce one stable ID for one application page.
+
+    Store names, AI titles and deadline formatting can change between sources.
+    They must not turn the same application page into a duplicate listing.
+    """
+    return hashlib.sha256(canonical_application_url(application_url).encode()).hexdigest()[:20]
 
 
 def notification_identity(store: str, title: str, application_url: str) -> str:
@@ -51,3 +64,73 @@ class Lottery:
 
     def to_dict(self):
         return asdict(self)
+
+
+def _quality(item: Lottery) -> tuple[int, int, int, int, int]:
+    """Prefer verified and information-rich versions of the same lottery."""
+    return (
+        int(item.official_confirmed),
+        int(item.source_kind == "official"),
+        int(bool(item.start_at and item.deadline)),
+        len(" ".join(item.conditions)),
+        len(item.title),
+    )
+
+
+def _first_value(items: list[Lottery], field_name: str, unknown: str = "unknown"):
+    for item in sorted(items, key=_quality, reverse=True):
+        value = getattr(item, field_name)
+        if value and value != unknown:
+            return value
+    return getattr(max(items, key=_quality), field_name)
+
+
+def deduplicate_lotteries(items: Iterable[Lottery]) -> list[Lottery]:
+    """Merge source variations so one application URL is shown once."""
+    groups: dict[str, list[Lottery]] = {}
+    for item in items:
+        key = canonical_application_url(item.application_url) or f"missing:{item.id}"
+        groups.setdefault(key, []).append(item)
+
+    merged: list[Lottery] = []
+    for group in groups.values():
+        ranked = sorted(group, key=_quality, reverse=True)
+        best = ranked[0]
+        conditions: list[str] = []
+        for item in ranked:
+            for condition in item.conditions:
+                cleaned = " ".join(condition.split())
+                if cleaned and cleaned not in conditions:
+                    conditions.append(cleaned)
+
+        first_seen = [item.first_seen_at for item in group if item.first_seen_at]
+        start_notified = [item.start_notified_at for item in group if item.start_notified_at]
+        message_ids = [item.discord_message_id for item in ranked if item.discord_message_id]
+        category = _first_value(ranked, "category")
+        if category == "unknown":
+            category = best.category
+        merged.append(
+            Lottery(
+                id=lottery_identity(best.store, best.title, best.application_url, best.deadline),
+                title=best.title,
+                category=category,
+                store=best.store,
+                store_key=best.store_key,
+                source_url=best.source_url,
+                application_url=best.application_url,
+                deadline=_first_value(ranked, "deadline", ""),
+                start_at=_first_value(ranked, "start_at", ""),
+                conditions=conditions,
+                source_kind=best.source_kind,
+                official_confirmed=any(item.official_confirmed for item in group),
+                eligibility=best.eligibility,
+                eligibility_reasons=best.eligibility_reasons,
+                application_method=_first_value(ranked, "application_method"),
+                receipt_method=_first_value(ranked, "receipt_method"),
+                status=best.status,
+                discord_message_id=message_ids[0] if message_ids else None,
+                first_seen_at=min(first_seen) if first_seen else None,
+                start_notified_at=min(start_notified) if start_notified else None,
+            )
+        )
+    return merged

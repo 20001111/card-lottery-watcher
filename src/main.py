@@ -14,7 +14,7 @@ from .admin_queue import send_candidate
 from .calendar import build_calendar
 from .discord_notify import send_review_queue_update, send_site_update
 from .eligibility import evaluate
-from .models import Lottery, lottery_identity, notification_identity
+from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .x_discovery import candidate_sources
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,11 +79,14 @@ def main():
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     now = datetime.now(ZoneInfo(config.get("timezone", "Asia/Tokyo")))
     old = load_state()
-    old_by_notification = {
-        notification_identity(previous["store"], previous["title"], previous["application_url"]): previous
-        for previous in old.values()
-        if previous.get("store") and previous.get("title") and previous.get("application_url")
-    }
+    old_by_notification = {}
+    for previous in old.values():
+        if not previous.get("application_url"):
+            continue
+        key = notification_identity(previous.get("store", ""), previous.get("title", ""), previous["application_url"])
+        existing = old_by_notification.get(key)
+        if not existing or (previous.get("discord_message_id") and not existing.get("discord_message_id")):
+            old_by_notification[key] = previous
     collected = {}
     queued_for_review = 0
     source_count = 0
@@ -146,14 +149,15 @@ def main():
                         source_kind=page_source.get("kind", "discovery"),
                         official_confirmed=page_source.get("kind") == "official" or bool(raw.get("official_confirmed")),
                     )
-                    collected[item.id] = evaluate(item, config.get("eligibility", {}))
+                    collected[item.id] = item
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")
 
     # A temporary source or AI outage must not erase still-open lotteries from
     # the calendar. Freshly verified entries replace their previous version.
+    fresh_urls = {canonical_application_url(item.application_url) for item in collected.values()}
     for item_id, previous in old.items():
-        if item_id in collected:
+        if canonical_application_url(previous.get("application_url", "")) in fresh_urls:
             continue
         try:
             previous_deadline = datetime.fromisoformat(previous.get("deadline", "").replace("Z", "+00:00"))
@@ -164,9 +168,14 @@ def main():
         except (TypeError, ValueError):
             continue
 
-    for item in collected.values():
-        item.discord_message_id = old.get(item.id, {}).get("discord_message_id")
-    items = list(collected.values())
+    # Different sources often describe the same form with slightly different
+    # titles.  Merge by application page before evaluating and publishing.
+    items = deduplicate_lotteries(collected.values())
+    for item in items:
+        previous = old_by_notification.get(notification_identity(item.store, item.title, item.application_url))
+        if previous:
+            item.discord_message_id = previous.get("discord_message_id")
+        evaluate(item, config.get("eligibility", {}))
     items.sort(key=lambda x: (x.eligibility not in ("eligible", "check"), x.deadline or "9999"))
 
     notified = set(old_by_notification)
