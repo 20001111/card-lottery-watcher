@@ -7,8 +7,14 @@ request_timeout_seconds: 8
 # Keep enough page context to find dates/conditions while avoiding very large
 # pages that make each AI check slow and expensive.
 ai_page_max_chars: 18000
-ai_request_timeout_seconds: 45
+ai_request_timeout_seconds: 30
 ai_model: gpt-5-mini
+# Maximum page-level AI checks in one run.  New manual/review URLs are checked
+# first, then official pages.  Aggregation sites only contribute links here.
+ai_max_pages_per_run: 12
+# Maximum number of pending URLs (manual submissions and discovery leads) to
+# enrich with AI in one run. These are handled before ordinary site pages.
+manual_review_limit: 8
 minimum_ai_confidence: 0.75
 # Leads with an application URL but missing a start date or deadline go only
 # to the private approval queue. Keeping this lower than the public threshold
@@ -24,9 +30,9 @@ official_detail_link_limit: 2
 discovery_detail_link_limit: 3
 # A discovery run can store this many external application links as private
 # review leads. They are checked on their own pages in later production runs.
-discovery_lead_link_limit: 20
+discovery_lead_link_limit: 30
 # Do not let one large summary site consume the whole review queue.
-discovery_lead_per_source_limit: 3
+discovery_lead_per_source_limit: 5
 
 # X is optional. When enabled, the official API makes exactly one search request
 # per workflow run and retrieves at most 10 posts. Every linked page still goes

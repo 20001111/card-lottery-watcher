@@ -1,7 +1,10 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from src.models import Lottery
 from unittest.mock import patch
 
-from src.supabase_sync import build_sync_rows, manual_review_sources
+from src.supabase_sync import build_sync_rows, known_application_urls, manual_review_sources
 
 
 def test_sync_rows_preserve_existing_staff_status_and_memo():
@@ -70,3 +73,31 @@ def test_manual_review_sources_include_only_pending_dashboard_urls(monkeypatch):
         "category": "pokemon",
         "url": "https://shop.example/entry",
     }]
+
+
+def test_known_application_urls_canonicalizes_tracking_parameters(monkeypatch):
+    monkeypatch.setenv("SUPABASE_URL", "https://project.example")
+    monkeypatch.setenv("SUPABASE_SECRET_KEY", "secret")
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return [{"application_url": "https://shop.example/entry/?utm_source=x"}]
+
+    with patch("src.supabase_sync.requests.get", return_value=Response()):
+        assert known_application_urls() == {"https://shop.example/entry"}
+
+
+def test_published_listing_becomes_expired_after_deadline():
+    item = Lottery(
+        "id", "Lottery", "pokemon", "Shop", "shop", "https://source.example",
+        "https://shop.example/entry", "2026-08-08T23:59:00+09:00", "2026-08-01T10:00:00+09:00",
+    )
+    rows = build_sync_rows(
+        [item],
+        {"https://shop.example/entry": {"status": "published"}},
+        datetime(2026, 8, 9, tzinfo=ZoneInfo("Asia/Tokyo")),
+    )
+    assert rows[0]["status"] == "expired"

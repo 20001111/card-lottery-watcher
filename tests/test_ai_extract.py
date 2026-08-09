@@ -4,7 +4,7 @@ from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
 from src.ai_extract import extract_with_ai, page_document
-from src.main import discovery_detail_urls, discovery_outbound_links
+from src.main import collect, discovery_detail_urls, discovery_outbound_links
 
 
 def test_page_document_keeps_absolute_links():
@@ -106,6 +106,23 @@ def test_discovery_outbound_links_keep_only_card_entry_links():
         20,
     )
     assert leads == [("https://shop.example/entry", "ポケモンカードの抽選受付 応募ページ")]
+
+
+def test_discovery_pages_queue_new_urls_without_spending_an_ai_call(monkeypatch):
+    html = '<title>ポケモンカード 抽選</title><h1>ポケカ 応募</h1><p>応募 <a href="https://shop.example/entry?utm_source=blog">応募ページ</a></p>'
+    monkeypatch.setattr("src.main.source_pages", lambda source, config: [(source, html)])
+    monkeypatch.setattr("src.main.candidate_sources", lambda config: [])
+    monkeypatch.setattr("src.main.manual_review_sources", lambda limit: [])
+    monkeypatch.setattr("src.main.known_application_urls", lambda: set())
+    with patch("src.main.extract_with_ai") as ai:
+        collected, _sources, extracted, queued = collect(
+            {"sources": [{"name": "Summary", "kind": "discovery", "category": "pokemon", "url": "https://summary.example"}], "discovery_lead_link_limit": 3, "discovery_lead_per_source_limit": 3},
+            datetime(2026, 8, 1, tzinfo=ZoneInfo("Asia/Tokyo")),
+        )
+    assert ai.call_count == 0
+    assert extracted == 0
+    assert queued == 1
+    assert list(collected.values())[0].application_url == "https://shop.example/entry"
 
 
 def test_discovery_outbound_links_use_relevant_page_scope_but_skip_ads():

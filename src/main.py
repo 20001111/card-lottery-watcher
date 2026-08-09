@@ -18,7 +18,12 @@ from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
 from .moderation import suppressed_urls
 from .supabase_sync import configured as supabase_configured
-from .supabase_sync import manual_review_sources, sync_statuses
+from .supabase_sync import (
+    known_application_urls,
+    manual_review_sources,
+    record_source_failure,
+    sync_statuses,
+)
 from .x_discovery import candidate_sources
 
 
@@ -219,6 +224,11 @@ def lottery_from_raw(raw: dict, source: dict) -> Lottery:
     )
 
 
+def _source_priority(source: dict) -> tuple[int, str]:
+    """Use the limited AI budget on direct pages before aggregation indexes."""
+    return ({"manual": 0, "official": 1, "discovery": 2}.get(source.get("kind"), 3), source.get("name", ""))
+
+
 def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, int]:
     sources = list(config["sources"])
     try:
@@ -226,42 +236,40 @@ def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, 
     except Exception as exc:
         print(f"WARN X discovery: {exc}")
     try:
-        manual_sources = manual_review_sources()
+        manual_sources = manual_review_sources(int(config.get("manual_review_limit", 8)))
         sources.extend(manual_sources)
         if manual_sources:
             print(f"MANUAL REVIEW: {len(manual_sources)} URL(s) queued for AI extraction")
     except Exception as exc:
         print(f"WARN manual review sources: {exc}")
 
+    # Deduplicate known application URLs before any AI request.  This prevents
+    # the same link from an X post, a blog, and an official list costing three
+    # separate AI checks.
+    try:
+        known_urls = known_application_urls()
+    except Exception as exc:
+        print(f"WARN known URL index: {exc}")
+        known_urls = set()
+
     collected: dict[str, Lottery] = {}
     lead_budget = int(config.get("discovery_lead_link_limit", 20))
     queued = extracted_count = 0
-    for source in sources:
+    ai_page_budget = int(config.get("ai_max_pages_per_run", 12))
+    for source in sorted(sources, key=_source_priority):
         source_lead_budget = (
             min(lead_budget, int(config.get("discovery_lead_per_source_limit", 3)))
             if source.get("kind") == "discovery" else 0
         )
         try:
             for page_source, html in source_pages(source, config):
-                document, allowed_links = page_document(html, page_source["url"], max_chars=int(config.get("ai_page_max_chars", 18000)))
-                extracted = extract_with_ai(page_source, document, allowed_links, now, config)
-                extracted_count += len(extracted)
-                print(f"EXTRACTED {page_source['name']}: {len(extracted)} candidate(s)")
-                for raw in extracted:
-                    # The AI extractor only returns an actual page link.  Keep
-                    # incomplete candidates too: staff can correct the dates
-                    # in the dashboard, publish them, or reject them.
-                    item = lottery_from_raw(raw, page_source)
-                    if not raw.get("start_at") or not raw.get("deadline"):
-                        item.status = "pending"
-                        queued += 1
-                    collected[item.id] = item
-                # Discovery pages can contain many useful links even when the
-                # AI cannot reliably describe every one from the long index.
-                # Save these as private leads first; their own pages are read
-                # by AI in a later production run.
+                # Aggregation pages are link finders only.  Saving their new
+                # external URLs as pending leads is free; a later run reads
+                # each direct page once with AI.
                 if page_source.get("kind") == "discovery" and source_lead_budget > 0:
                     for url, title in discovery_outbound_links(html, page_source["url"], page_source, source_lead_budget):
+                        if url in known_urls or any(canonical_application_url(item.application_url) == url for item in collected.values()):
+                            continue
                         lead = Lottery(
                             id=lottery_identity("店舗確認待ち", title, url),
                             title=title,
@@ -273,16 +281,44 @@ def collect(config: dict, now: datetime) -> tuple[dict[str, Lottery], int, int, 
                             source_kind="lead",
                             status="pending",
                         )
-                        if any(canonical_application_url(item.application_url) == url for item in collected.values()):
-                            continue
                         collected[lead.id] = lead
+                        known_urls.add(url)
                         queued += 1
                         lead_budget -= 1
                         source_lead_budget -= 1
                         if lead_budget <= 0 or source_lead_budget <= 0:
                             break
+                    continue
+
+                page_url = canonical_application_url(page_source["url"])
+                # A manually submitted pending URL is intentionally checked
+                # once despite already existing in Supabase.
+                if page_source.get("kind") != "manual" and page_url in known_urls:
+                    print(f"SKIP known page: {page_source['name']}")
+                    continue
+                if ai_page_budget <= 0:
+                    print(f"SKIP AI budget: {page_source['name']}")
+                    continue
+                ai_page_budget -= 1
+                document, allowed_links = page_document(html, page_source["url"], max_chars=int(config.get("ai_page_max_chars", 18000)))
+                extracted = extract_with_ai(page_source, document, allowed_links, now, config)
+                extracted_count += len(extracted)
+                print(f"EXTRACTED {page_source['name']}: {len(extracted)} candidate(s)")
+                for raw in extracted:
+                    url = canonical_application_url(raw["application_url"])
+                    if url in known_urls and page_source.get("kind") != "manual":
+                        print(f"SKIP known application URL: {url}")
+                        continue
+                    raw["application_url"] = url
+                    item = lottery_from_raw(raw, page_source)
+                    if not raw.get("start_at") or not raw.get("deadline"):
+                        item.status = "pending"
+                        queued += 1
+                    collected[item.id] = item
+                    known_urls.add(url)
         except Exception as exc:
             print(f"WARN {source['name']}: {exc}")
+            record_source_failure(source, exc)
     return collected, len(sources), extracted_count, queued
 
 
@@ -392,7 +428,7 @@ def main() -> None:
     # dashboard instead of disappearing after one collection run. Development
     # runs deliberately do not change the real approval queue.
     try:
-        statuses = sync_statuses(items) if publish_public else None
+        statuses = sync_statuses(items, now) if publish_public else None
     except Exception as exc:
         # Do not replace the Website with an empty page if Supabase is down.
         # The next run will retry and the previous published Website remains.
@@ -404,6 +440,12 @@ def main() -> None:
         public_calendar_items = [
             item for item in calendar_items
             if statuses.get(canonical_application_url(item.get("application_url", ""))) == "published"
+        ]
+        # A start alert is useful only for a listing the officers have already
+        # approved for the public Website.
+        started_items = [
+            item for item in started_items
+            if statuses.get(canonical_application_url(item.application_url)) == "published"
         ]
     if publish_public:
         publish(items, public_calendar_items, config)

@@ -8,6 +8,7 @@ silently overwrite that decision.
 from __future__ import annotations
 
 import os
+from datetime import datetime
 from typing import Iterable
 
 import requests
@@ -32,7 +33,29 @@ def _endpoint() -> str:
     return os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/lottery_listings"
 
 
-def manual_review_sources(limit: int = 20) -> list[dict]:
+def known_application_urls() -> set[str]:
+    """Return every URL already stored in the review database.
+
+    This is intentionally a very cheap request.  It runs *before* OpenAI is
+    called so recurring links from aggregation sites do not consume AI calls.
+    """
+    if not configured():
+        return set()
+    response = requests.get(
+        _endpoint(),
+        params={"select": "application_url"},
+        headers=_headers(),
+        timeout=20,
+    )
+    response.raise_for_status()
+    return {
+        canonical_application_url(row.get("application_url", ""))
+        for row in response.json()
+        if row.get("application_url")
+    }
+
+
+def manual_review_sources(limit: int = 8) -> list[dict]:
     """Return staff-submitted URLs that should be fact-checked by AI.
 
     Officers can submit only an application URL in the private dashboard.  A
@@ -73,7 +96,46 @@ def manual_review_sources(limit: int = 20) -> list[dict]:
     return sources
 
 
-def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list[dict]:
+def record_source_failure(source: dict, error: Exception | str) -> None:
+    """Persist a safe, short failure record for the officers.
+
+    A source outage must not silently look like "there were no lotteries".
+    Failure recording is best effort so an unavailable diagnostics table never
+    prevents the normal collection and review queue from working.
+    """
+    if not configured():
+        return
+    message = str(error).replace("\n", " ")[:500]
+    payload = {
+        "source_name": str(source.get("name", "unknown"))[:160],
+        "source_url": str(source.get("url", ""))[:1000],
+        "error_type": type(error).__name__ if isinstance(error, Exception) else "Error",
+        "message": message,
+    }
+    try:
+        response = requests.post(
+            os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/collection_failures",
+            headers={**_headers(), "Prefer": "return=minimal"},
+            json=payload,
+            timeout=12,
+        )
+        response.raise_for_status()
+    except requests.RequestException as logging_error:
+        print(f"WARN failure log: {logging_error}")
+
+
+def _expired(listing: dict, now: datetime | None) -> bool:
+    if now is None or not listing.get("deadline"):
+        return False
+    try:
+        deadline = datetime.fromisoformat(str(listing["deadline"]).replace("Z", "+00:00"))
+        deadline = deadline.replace(tzinfo=now.tzinfo) if deadline.tzinfo is None else deadline
+        return deadline <= now
+    except ValueError:
+        return False
+
+
+def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: datetime | None = None) -> list[dict]:
     """Prepare rows while preserving a staff decision and its memo."""
     rows = []
     for item in items:
@@ -96,12 +158,17 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list
         for field in ("title", "store", "start_at", "deadline", "conditions", "region"):
             if field in overrides:
                 listing[field] = overrides[field]
+        current_status = before.get("status", "pending")
+        # Published records are kept as history, but are automatically removed
+        # from the public Website once their deadline passes.
+        if current_status == "published" and _expired(listing, now):
+            current_status = "expired"
         rows.append(
             {
                 "application_url": url,
                 "listing": listing,
                 # New discoveries require approval. Existing decisions win.
-                "status": before.get("status", "pending"),
+                "status": current_status,
                 "overrides": overrides,
                 "note": before.get("note", ""),
             }
@@ -109,7 +176,7 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict]) -> list
     return rows
 
 
-def sync_statuses(items: Iterable[Lottery]) -> dict[str, str] | None:
+def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict[str, str] | None:
     """Upsert collected listings and return their current publication states.
 
     ``None`` means that Supabase is not configured; this keeps the old
@@ -120,14 +187,41 @@ def sync_statuses(items: Iterable[Lottery]) -> dict[str, str] | None:
 
     endpoint = _endpoint()
     headers = _headers()
-    response = requests.get(endpoint, params={"select": "application_url,status,note,overrides"}, headers=headers, timeout=20)
+    # ``listing`` is required here too: it preserves staff-confirmed facts and
+    # lets us expire a published entry even when its source later disappears.
+    response = requests.get(
+        endpoint,
+        params={"select": "application_url,status,note,overrides,listing"},
+        headers=headers,
+        timeout=20,
+    )
     response.raise_for_status()
     existing = {
         canonical_application_url(row["application_url"]): row
         for row in response.json()
         if row.get("application_url")
     }
-    rows = build_sync_rows(items, existing)
+    rows = build_sync_rows(items, existing, now)
+    seen_urls = {row["application_url"] for row in rows}
+    # A listing can disappear from its source after the deadline.  Preserve it
+    # as history anyway, instead of requiring a later crawler match in order
+    # to mark it expired.
+    for url, before in existing.items():
+        listing = before.get("listing") or {}
+        if (
+            url not in seen_urls
+            and before.get("status") == "published"
+            and _expired(listing, now)
+        ):
+            rows.append(
+                {
+                    "application_url": url,
+                    "listing": listing,
+                    "status": "expired",
+                    "overrides": before.get("overrides") or {},
+                    "note": before.get("note", ""),
+                }
+            )
     if rows:
         upsert_headers = {**headers, "Prefer": "resolution=merge-duplicates"}
         response = requests.post(endpoint, params={"on_conflict": "application_url"}, headers=upsert_headers, json=rows, timeout=20)

@@ -10,7 +10,7 @@ create table if not exists public.lottery_listings (
   application_url text primary key,
   listing jsonb not null,
   status text not null default 'pending'
-    check (status in ('pending', 'published', 'suppressed')),
+    check (status in ('pending', 'published', 'suppressed', 'expired')),
   -- Officer corrections survive later AI collection updates.
   overrides jsonb not null default '{}'::jsonb,
   note text not null default '',
@@ -22,6 +22,23 @@ create table if not exists public.lottery_listings (
 -- Safe to run again after the initial table was created.
 alter table public.lottery_listings
   add column if not exists overrides jsonb not null default '{}'::jsonb;
+
+-- Old projects may have been created before the `expired` state existed.
+alter table public.lottery_listings
+  drop constraint if exists lottery_listings_status_check;
+alter table public.lottery_listings
+  add constraint lottery_listings_status_check
+  check (status in ('pending', 'published', 'suppressed', 'expired'));
+
+-- Diagnostics are private: failures show why a source produced no leads.
+create table if not exists public.collection_failures (
+  id bigint generated always as identity primary key,
+  source_name text not null,
+  source_url text not null,
+  error_type text not null,
+  message text not null,
+  occurred_at timestamptz not null default now()
+);
 
 create or replace function public.is_lottery_admin()
 returns boolean
@@ -39,6 +56,7 @@ $$;
 
 alter table public.admin_allowlist enable row level security;
 alter table public.lottery_listings enable row level security;
+alter table public.collection_failures enable row level security;
 
 create policy "admins can view their own allowlist record"
 on public.admin_allowlist for select
@@ -56,6 +74,11 @@ create policy "admins can edit lottery listings"
 on public.lottery_listings for update
 using (public.is_lottery_admin())
 with check (public.is_lottery_admin());
+
+drop policy if exists "admins can read collection failures" on public.collection_failures;
+create policy "admins can read collection failures"
+on public.collection_failures for select
+using (public.is_lottery_admin());
 
 -- Initial administrator. Add other officer email addresses with the same form later.
 insert into public.admin_allowlist (email)
