@@ -1,18 +1,16 @@
 [
   {
-    "id": "010f1629f313de1b2cf3",
-    "title": "お宝創庫・プレイズ 抽選（ポケモンカード スタートデッキ100 バトルコレクション）",
+    "id": "bb5e53498d2c1c5da9bb",
+    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア等） 抽選（トレカキャピタル）",
     "category": "pokemon",
-    "store": "お宝創庫・プレイズ",
+    "store": "トレカキャピタル",
     "store_key": "nyuka_now",
     "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://www.otakarasouko.com/information/95974455/#gsc.tab=0",
-    "deadline": "2026-08-09T23:45:00+09:00",
-    "start_at": "2026-08-06T12:00:00+09:00",
+    "application_url": "https://edion-cp.com/pokeca082802",
+    "deadline": "2026-08-16T23:59:00+09:00",
+    "start_at": "2026-08-07T10:00:00+09:00",
     "conditions": [
-      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
-      "過去1年以内にお宝創庫グループ店舗で会員証を提示して売買利用した履歴があること",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること"
+      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
     ],
     "source_kind": "discovery",
     "official_confirmed": false,
@@ -25,92 +23,8 @@
     "status": "open",
     "discord_message_id": null,
     "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
-  },
-  {
-    "id": "c56de9d195a0d5fda18a",
-    "title": "お宝創庫・プレイズ 抽選（ポケモンカード ストームエメラルダ / メガブレイブ / メガシンフォニア）",
-    "category": "pokemon",
-    "store": "お宝創庫・プレイズ",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://www.otakarasouko.com/information/95974456/#gsc.tab=0",
-    "deadline": "2026-08-09T23:45:00+09:00",
-    "start_at": "2026-08-06T12:00:00+09:00",
-    "conditions": [
-      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
-      "過去1年以内にお宝創庫グループ店舗で会員証を提示して売買利用した履歴があること",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示して売買利用した履歴があること",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること",
-      "過去1年以内にお宝創庫グループ店舗で会員証を提示して売買利用した履歴"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "アプリを要確認"
-    ],
-    "application_method": "unknown",
-    "receipt_method": "unknown",
-    "status": "open",
-    "discord_message_id": null,
-    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
-  },
-  {
-    "id": "dad66ab0e38a2bbb981c",
-    "title": "ワンピースカードゲーム スタートデッキEX ルフィ＆エース[ST-30] 抽選（お宝創庫・プレイズ）",
-    "category": "onepiece",
-    "store": "お宝創庫・プレイズ",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/97393",
-    "application_url": "https://www.otakarasouko.com/information/95974459/#gsc.tab=0",
-    "deadline": "2026-08-09T23:45:00+09:00",
-    "start_at": "2026-08-06T12:00:00+09:00",
-    "conditions": [
-      "ポイント共有手続き済みのお宝創庫グループアプリ会員であること",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示の上売買利用した履歴があること",
-      "ポイント共有手続き済みのお宝創庫グループアプリ会員",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買利用履歴があること",
-      "過去1年以内にお宝創庫グループ店舗で会員証提示の売買履歴があること"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "アプリを要確認"
-    ],
-    "application_method": "unknown",
-    "receipt_method": "unknown",
-    "status": "open",
-    "discord_message_id": null,
-    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
-  },
-  {
-    "id": "5f132221bc7a385cd919",
-    "title": "30周年エーフィ・ブラッキーデッキ 抽選（ポケモンカード）",
-    "category": "pokemon",
-    "store": "カードボックス 池袋店",
-    "store_key": "cardchusen",
-    "source_url": "https://cardchusen.com/",
-    "application_url": "https://shoplottery.e-starbox.com/lottery/entry?code=OHUXLecZR9",
-    "deadline": "2026-08-10T23:59:00+09:00",
-    "start_at": null,
-    "conditions": [
-      "オンライン",
-      "SNS応募"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "unknown",
-    "eligibility_reasons": [],
-    "application_method": "unknown",
-    "receipt_method": "unknown",
-    "status": "open",
-    "discord_message_id": null,
-    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": null
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   },
   {
     "id": "d2d109072397a5fcb79d",
@@ -135,7 +49,8 @@
     "status": "open",
     "discord_message_id": null,
     "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": null
+    "start_notified_at": null,
+    "is_new": false
   },
   {
     "id": "f2b6613e88cb41e15ba3",
@@ -159,58 +74,7 @@
     "status": "open",
     "discord_message_id": null,
     "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
-  },
-  {
-    "id": "7410d423b75d18a78f51",
-    "title": "ポケモンカード スタートデッキ100 バトルコレクション／ストームエメラルダ／メガブレイブ／メガシンフォニア 抽選（エディオン・トレカキャピタル各店）",
-    "category": "pokemon",
-    "store": "エディオン・トレカキャピタル各店",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://edion-cp.com/pokeca082801",
-    "deadline": "2026-08-16T23:59:00+09:00",
-    "start_at": "2026-08-07T10:00:00+09:00",
-    "conditions": [
-      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "アプリを要確認"
-    ],
-    "application_method": "unknown",
-    "receipt_method": "unknown",
-    "status": "open",
-    "discord_message_id": null,
-    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
-  },
-  {
-    "id": "bb5e53498d2c1c5da9bb",
-    "title": "ポケモンカード（スタートデッキ100／ストームエメラルダ／メガブレイブ／メガシンフォニア等） 抽選（トレカキャピタル）",
-    "category": "pokemon",
-    "store": "トレカキャピタル",
-    "store_key": "nyuka_now",
-    "source_url": "https://nyuka-now.com/archives/2459",
-    "application_url": "https://edion-cp.com/pokeca082802",
-    "deadline": "2026-08-16T23:59:00+09:00",
-    "start_at": "2026-08-07T10:00:00+09:00",
-    "conditions": [
-      "当社各種会員限定（クレジット機能付エディオンカード会員、あんしん保証会員、アプリ会員、ID会員が対象）"
-    ],
-    "source_kind": "discovery",
-    "official_confirmed": false,
-    "eligibility": "check",
-    "eligibility_reasons": [
-      "アプリを要確認"
-    ],
-    "application_method": "unknown",
-    "receipt_method": "unknown",
-    "status": "open",
-    "discord_message_id": null,
-    "first_seen_at": "2026-08-07T10:11:19.752822+09:00",
-    "start_notified_at": "2026-08-09T10:11:19.752822+09:00"
+    "start_notified_at": "2026-08-09T10:11:19.752822+09:00",
+    "is_new": false
   }
 ]
