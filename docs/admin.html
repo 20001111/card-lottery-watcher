@@ -18,7 +18,7 @@
   <section id="login" class="panel login hidden"><h2>幹部ログイン</h2><p class="sub">登録済みメールアドレスへログイン用リンクを送ります。</p><input id="email" class="input" type="email" autocomplete="email" placeholder="メールアドレス"><button id="send-link" class="button">ログインリンクを送る</button><div id="login-message"></div></section>
 
   <section id="app" class="hidden">
-    <section class="panel"><div class="row between"><div><h2>抽選一覧</h2><p id="who" class="sub"></p></div><div class="row"><button id="import" class="button secondary">現在のWebsiteから取り込む</button><button id="logout" class="button secondary">ログアウト</button></div></div><div id="message"></div><div class="stats"><div class="stat"><span>確認待ち</span><b id="pending-count">0</b></div><div class="stat"><span>公開中</span><b id="published-count">0</b></div><div class="stat"><span>非表示</span><b id="suppressed-count">0</b></div></div><div class="row filters"><label>表示 <select id="filter"><option value="all">すべて</option><option value="pending">確認待ち</option><option value="published">公開中</option><option value="suppressed">非表示</option></select></label><button id="refresh" class="button secondary">再読み込み</button></div></section>
+    <section class="panel"><div class="row between"><div><h2>抽選一覧</h2><p id="who" class="sub"></p></div><div class="row"><button id="import" class="button secondary">現在のWebsiteから取り込む</button><button id="logout" class="button secondary">ログアウト</button></div></div><div id="message"></div><div class="stats"><div class="stat"><span>確認待ち</span><b id="pending-count">0</b></div><div class="stat"><span>公開中</span><b id="published-count">0</b></div><div class="stat"><span>非表示</span><b id="suppressed-count">0</b></div></div><div class="row filters"><label>表示 <select id="filter"><option value="all">通常の一覧</option><option value="pending">確認待ち</option><option value="published">公開中</option><option value="suppressed">非表示</option><option value="expired">期限切れ・履歴</option></select></label><button id="refresh" class="button secondary">再読み込み</button></div></section>
     <section class="panel"><h2>🔗 応募URLを追加</h2><p class="sub">URLだけで追加できます。同じ応募URLがないか確認してから、まず「確認待ち」に保存します。次回の本番収集でAIが店舗・日付・条件を補完し、幹部が確認して公開します。</p><div class="row"><input id="manual-url" class="input" type="url" placeholder="https://... 応募ページのURL"><label>カード <select id="manual-category"><option value="pokemon">ポケモン</option><option value="onepiece">ワンピース</option><option value="both">両方・不明</option></select></label><button id="add-manual" class="button">重複確認して確認待ちへ</button></div><div id="manual-message"></div></section>
     <section id="list"></section>
   </section>
@@ -35,7 +35,7 @@
   const hide = (id) => $(id).classList.add('hidden');
   const message = (text, type = 'info') => { $('message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
   const loginMessage = (text, type = 'info') => { $('login-message').innerHTML = text ? `<div class="notice ${type}">${text}</div>` : ''; };
-  const labels = { pending: '確認待ち', published: '公開中', suppressed: '非表示' };
+  const labels = { pending: '確認待ち', published: '公開中', suppressed: '非公開', expired: '期限切れ・履歴' };
   let client, items = [], currentUser;
 
   function statusBadge(status) { return `<span class="label status-${status}">${labels[status]}</span>`; }
@@ -68,7 +68,7 @@
 
   function render() {
     const filter = $('filter').value;
-    const visible = sortForReview(filter === 'all' ? items : items.filter(item => item.status === filter));
+    const visible = sortForReview(filter === 'all' ? items.filter(item => item.status !== 'expired') : items.filter(item => item.status === filter));
     $('pending-count').textContent = items.filter(item => item.status === 'pending').length;
     $('published-count').textContent = items.filter(item => item.status === 'published').length;
     $('suppressed-count').textContent = items.filter(item => item.status === 'suppressed').length;
@@ -87,8 +87,13 @@
       const conditions = Array.isArray(listing.conditions) ? listing.conditions.join('\n') : '';
       const details = document.createElement('details');
       details.className = 'edit';
-      details.innerHTML = `<summary>✏️ 内容を微修正</summary><div class="edit-grid"><label>店舗<input data-field="store" class="input" value="${safe(listing.store || '')}"></label><label>商品・抽選名<input data-field="title" class="input" value="${safe(listing.title || '')}"></label><label>開始<input data-field="start_at" class="input" type="datetime-local" value="${safe((listing.start_at || '').slice(0,16))}"></label><label>締切<input data-field="deadline" class="input" type="datetime-local" value="${safe((listing.deadline || '').slice(0,16))}"></label><label>地域<input data-field="region" class="input" placeholder="例：関東 / 全国" value="${safe(listing.region || '')}"></label><label>応募条件（1行ずつ）<textarea data-field="conditions">${safe(conditions)}</textarea></label></div><button class="button secondary" data-action="save-listing">修正を保存</button>`;
+      details.innerHTML = `<summary>✏️ 内容を微修正</summary><p class="sub">AIの回答を下の「AI回答をまとめて貼り付け」へそのまま入れられます。貼り付けた項目は、下の個別入力より優先します。公開時も一緒に保存します。</p><label>AI回答をまとめて貼り付け<textarea data-ai-paste placeholder="{&#10;店舗: ○○店&#10;商品・抽選名: ポケモンカード ○○ 抽選&#10;開始日: 2026/08/10 12:00&#10;終了: 2026/08/12 23:59&#10;地域: 関東&#10;応募条件: アプリ会員&#10;}"></textarea></label><div class="edit-grid"><label>店舗<input data-field="store" class="input" value="${safe(listing.store || '')}"></label><label>商品・抽選名<input data-field="title" class="input" value="${safe(listing.title || '')}"></label><label>開始<input data-field="start_at" class="input" type="text" placeholder="例：2026/08/10 12:00" value="${safe((listing.start_at || '').slice(0,16).replace('T', ' '))}"></label><label>締切<input data-field="deadline" class="input" type="text" placeholder="例：2026/08/10 23:59" value="${safe((listing.deadline || '').slice(0,16).replace('T', ' '))}"></label><label>地域<input data-field="region" class="input" placeholder="例：関東 / 全国" value="${safe(listing.region || '')}"></label><label>応募条件（1行ずつ）<textarea data-field="conditions">${safe(conditions)}</textarea></label></div><button class="button secondary" data-action="save-listing">修正を保存</button>`;
+      const aiPaste = details.querySelector('[data-ai-paste]');
       card.querySelector('.actions').before(details);
+      const extra = document.createElement('details');
+      extra.className = 'edit';
+      extra.innerHTML = `<summary>➕ その他（抽選結果の通知）</summary><p class="sub">結果発表日時を入れ、「通知する」をオンにしたものだけ、朝9時の本番更新後にDiscordへ1回通知します。</p><div class="edit-grid"><label>結果発表日時<input data-result-field="result_announcement_at" class="input" type="text" placeholder="例：2026/08/10 12:00" value="${safe((listing.result_announcement_at || '').slice(0,16).replace('T', ' '))}"></label><label>結果確認URL<input data-result-field="result_url" class="input" type="url" placeholder="未入力なら応募URLを使います" value="${safe(listing.result_url || '')}"></label><label><input data-result-field="result_notification_enabled" type="checkbox" ${listing.result_notification_enabled ? 'checked' : ''}> 結果確認をDiscordで通知する</label></div><button class="button secondary" data-action="save-result-settings">結果通知の設定を保存</button>`;
+      card.querySelector('.actions').before(extra);
     });
   }
 
@@ -102,6 +107,91 @@
     if (error) { message(`保存に失敗しました：${safe(error.message)}`, 'error'); return false; }
     await load(); message('保存しました。', 'ok'); return true;
   }
+  function parseJstDateTime(value, label) {
+    const text = String(value || '').trim();
+    if (!text) return null;
+    const normalized = text
+      .replace(/[／]/g, '/')
+      .replace(/[.．。]/g, '/')
+      .replace(/[年月]/g, match => match === '年' ? '/' : '/')
+      .replace(/[日]/g, '')
+      .replace(/[時]/g, ':')
+      .replace(/[分]/g, '')
+      .replace(/\s+/g, ' ');
+    const match = normalized.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})(?:[ T]+(\d{1,2})(?::(\d{1,2}))?)?$/);
+    if (!match) throw new Error(`${label}は「2026/08/10 12:00」の形で入力してください。`);
+    const [, year, month, day, hour = '0', minute = '0'] = match;
+    const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute)));
+    if (date.getUTCFullYear() !== Number(year) || date.getUTCMonth() !== Number(month) - 1 || date.getUTCDate() !== Number(day) || Number(hour) > 23 || Number(minute) > 59) {
+      throw new Error(`${label}の日付または時刻が正しくありません。`);
+    }
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+09:00`;
+  }
+  function applyAIPaste(card, listing, overrides) {
+    const field = card.querySelector('[data-ai-paste]');
+    const text = field?.value.trim();
+    if (!text) return;
+    const values = {};
+    text.replace(/[{}]/g, '').split(/\r?\n/).forEach(line => {
+      const match = line.match(/^\s*([^:：]+)\s*[:：]\s*(.+?)\s*$/);
+      if (match) values[match[1].replace(/\s/g, '')] = match[2];
+    });
+    const get = (...names) => names.map(name => values[name.replace(/\s/g, '')]).find(Boolean);
+    const set = (key, value) => { listing[key] = value; overrides[key] = value; };
+    const store = get('店舗', '店舗名');
+    const title = get('商品・抽選名', '商品名', '抽選名', '商品');
+    const start = get('開始日', '開始', '受付開始');
+    const deadline = get('終了', '終了日', '締切', '受付終了');
+    const region = get('地域', 'エリア');
+    const conditions = get('応募条件', '条件');
+    if (!Object.keys(values).length) throw new Error('「項目名: 内容」の形で貼り付けてください。');
+    if (store) set('store', store);
+    if (title) set('title', title);
+    if (region) set('region', region);
+    if (conditions) set('conditions', conditions.split(/\s*[／/]\s*|\n+/).filter(Boolean));
+    if (start) {
+      set('start_at', parseJstDateTime(start, '開始日'));
+    }
+    if (deadline) {
+      set('deadline', parseJstDateTime(deadline, '終了'));
+    }
+  }
+  function collectListingEdits(card, record) {
+    const listing = { ...(record?.listing || {}) };
+    const overrides = { ...(record?.overrides || {}) };
+    card.querySelectorAll('[data-field]').forEach(field => {
+      let value = field.value.trim();
+      if (field.dataset.field === 'conditions') value = value ? value.split(/\n+/).map(line => line.trim()).filter(Boolean) : [];
+      if (field.dataset.field === 'start_at') value = parseJstDateTime(value, '開始日');
+      if (field.dataset.field === 'deadline') value = parseJstDateTime(value, '締切日');
+      listing[field.dataset.field] = value;
+      overrides[field.dataset.field] = value;
+    });
+    // A structured AI answer is easier to paste than copying individual values.
+    // When present, it intentionally wins over the individual fields above.
+    applyAIPaste(card, listing, overrides);
+    return { listing, overrides };
+  }
+  function collectResultEdits(card, listing) {
+    const dateField = card.querySelector('[data-result-field="result_announcement_at"]');
+    const urlField = card.querySelector('[data-result-field="result_url"]');
+    const enabledField = card.querySelector('[data-result-field="result_notification_enabled"]');
+    if (!dateField || !urlField || !enabledField) return listing;
+    const previous = {
+      result_announcement_at: listing.result_announcement_at || '',
+      result_url: listing.result_url || '',
+      result_notification_enabled: Boolean(listing.result_notification_enabled),
+    };
+    listing.result_announcement_at = parseJstDateTime(dateField.value, '結果発表日時');
+    listing.result_url = canonicalUrl(urlField.value) || null;
+    listing.result_notification_enabled = enabledField.checked;
+    if (
+      previous.result_announcement_at !== (listing.result_announcement_at || '') ||
+      previous.result_url !== (listing.result_url || '') ||
+      previous.result_notification_enabled !== listing.result_notification_enabled
+    ) listing.result_notified_at = null;
+    return listing;
+  }
   async function addManualUrl() {
     const url = canonicalUrl($('manual-url').value);
     if (!url) throw new Error('https:// から始まる応募ページのURLを入力してください。');
@@ -111,7 +201,7 @@
       return;
     }
     const now = new Date().toISOString();
-    const listing = { title: '内容確認待ちの応募URL', store: '店舗未確認', category: $('manual-category').value, store_key: 'manual_submission', source_url: url, application_url: url, source_kind: 'manual', official_confirmed: false, conditions: [], start_at: null, deadline: null, application_method: 'unknown', receipt_method: 'unknown' };
+    const listing = { title: '内容確認待ちの応募URL', store: '店舗未確認', category: $('manual-category').value, store_key: 'manual_submission', source_url: url, application_url: url, source_kind: 'manual', official_confirmed: false, conditions: [], start_at: null, deadline: null };
     const { error } = await client.from('lottery_listings').insert({ application_url: url, listing, status: 'pending', note: '管理画面からURLを追加。AI確認待ち。', submitted_by: currentUser?.email || null, created_at: now, updated_at: now });
     if (error) throw error;
     $('manual-url').value = '';
@@ -171,19 +261,22 @@
     const card = button.closest('.listing'), url = card.dataset.url, action = button.dataset.action;
     if (action === 'save-note') return update(url, { note: card.querySelector('[data-note]').value });
     if (action === 'save-listing') {
-      const record = items.find(item => item.application_url === url), listing = { ...(record?.listing || {}) };
-      const overrides = { ...(record?.overrides || {}) };
-      card.querySelectorAll('[data-field]').forEach(field => {
-        let value = field.value.trim();
-        if (field.dataset.field === 'conditions') value = value ? value.split(/\n+/).map(line => line.trim()).filter(Boolean) : [];
-        if (field.dataset.field === 'start_at' || field.dataset.field === 'deadline') value = value ? `${value}:00+09:00` : null;
-        listing[field.dataset.field] = value;
-        overrides[field.dataset.field] = value;
-      });
+      const record = items.find(item => item.application_url === url);
+      const { listing, overrides } = collectListingEdits(card, record);
       return update(url, { listing, overrides });
+    }
+    if (action === 'save-result-settings') {
+      const record = items.find(item => item.application_url === url), listing = collectResultEdits(card, { ...(record?.listing || {}) });
+      return update(url, { listing });
     }
     if (action === 'suppress' && !confirm('この抽選を非表示にしますか？')) return;
     const status = action === 'restore' || action === 'publish' ? 'published' : action === 'pending' ? 'pending' : 'suppressed';
+    if (action === 'publish') {
+      const record = items.find(item => item.application_url === url);
+      const { listing, overrides } = collectListingEdits(card, record);
+      collectResultEdits(card, listing);
+      return update(url, { status, listing, overrides });
+    }
     await update(url, { status });
   });
   start();

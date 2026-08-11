@@ -8,7 +8,7 @@ silently overwrite that decision.
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Iterable
 
 import requests
@@ -33,6 +33,36 @@ def _endpoint() -> str:
     return os.environ["SUPABASE_URL"].rstrip("/") + "/rest/v1/lottery_listings"
 
 
+def _all_listing_rows(select: str) -> list[dict]:
+    """Read every listing, not just the first REST page.
+
+    Supabase/PostgREST commonly caps one response at 1,000 rows.  The URL
+    history is our pre-AI duplicate guard, so silently losing older rows here
+    would eventually cause repeat links to be researched again.
+    """
+    rows: list[dict] = []
+    offset = 0
+    page_size = 1000
+    while True:
+        response = requests.get(
+            _endpoint(),
+            params={
+                "select": select,
+                "order": "application_url.asc",
+                "limit": str(page_size),
+                "offset": str(offset),
+            },
+            headers=_headers(),
+            timeout=20,
+        )
+        response.raise_for_status()
+        page = response.json()
+        rows.extend(page)
+        if len(page) < page_size:
+            return rows
+        offset += len(page)
+
+
 def known_application_urls() -> set[str]:
     """Return every URL already stored in the review database.
 
@@ -41,18 +71,33 @@ def known_application_urls() -> set[str]:
     """
     if not configured():
         return set()
-    response = requests.get(
-        _endpoint(),
-        params={"select": "application_url"},
-        headers=_headers(),
-        timeout=20,
-    )
-    response.raise_for_status()
     return {
         canonical_application_url(row.get("application_url", ""))
-        for row in response.json()
+        for row in _all_listing_rows("application_url")
         if row.get("application_url")
     }
+
+
+def published_listings(now: datetime | None = None) -> list[dict]:
+    """Return the staff-approved listings that are eligible for the Website.
+
+    The public Website must be rebuilt from this list, not only from whatever
+    happened to be collected in the current run.  That way an approved entry
+    remains visible when its source is temporarily unavailable.
+    """
+    if not configured():
+        return []
+    published: list[dict] = []
+    for row in _all_listing_rows("application_url,status,listing"):
+        if row.get("status") != "published":
+            continue
+        listing = dict(row.get("listing") or {})
+        url = canonical_application_url(row.get("application_url", ""))
+        if not url or _expired(listing, now):
+            continue
+        listing["application_url"] = url
+        published.append(listing)
+    return published
 
 
 def manual_review_sources(limit: int = 8) -> list[dict]:
@@ -124,6 +169,50 @@ def record_source_failure(source: dict, error: Exception | str) -> None:
         print(f"WARN failure log: {logging_error}")
 
 
+def due_result_notifications(now: datetime) -> list[dict]:
+    """Return published listings whose staff-enabled result reminder is due."""
+    if not configured():
+        return []
+    response = requests.get(
+        _endpoint(),
+        params={"select": "application_url,listing", "status": "eq.published"},
+        headers=_headers(),
+        timeout=20,
+    )
+    response.raise_for_status()
+    due = []
+    for row in response.json():
+        listing = row.get("listing") or {}
+        if not listing.get("result_notification_enabled") or listing.get("result_notified_at"):
+            continue
+        value = listing.get("result_announcement_at")
+        if not value:
+            continue
+        try:
+            announced_at = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+            announced_at = announced_at.replace(tzinfo=now.tzinfo) if announced_at.tzinfo is None else announced_at
+        except ValueError:
+            continue
+        if announced_at <= now:
+            due.append({"application_url": row["application_url"], "listing": listing})
+    return due
+
+
+def mark_result_notified(application_url: str, listing: dict, now: datetime) -> None:
+    """Mark only a successfully delivered result reminder as sent."""
+    if not configured():
+        return
+    updated_listing = {**listing, "result_notified_at": now.isoformat()}
+    response = requests.patch(
+        _endpoint(),
+        params={"application_url": f"eq.{canonical_application_url(application_url)}"},
+        headers={**_headers(), "Prefer": "return=minimal"},
+        json={"listing": updated_listing, "updated_at": now.isoformat()},
+        timeout=20,
+    )
+    response.raise_for_status()
+
+
 def _expired(listing: dict, now: datetime | None) -> bool:
     if now is None or not listing.get("deadline"):
         return False
@@ -133,6 +222,30 @@ def _expired(listing: dict, now: datetime | None) -> bool:
         return deadline <= now
     except ValueError:
         return False
+
+
+def archive_stale_suppressed(now: datetime, retention_days: int = 60) -> int:
+    """Move old rejected entries out of the normal management queue.
+
+    The application URL remains stored as a lightweight history record.  That
+    is important: if a summary site repeats the same old link next month, it
+    is still recognized before any OpenAI request is made.
+    """
+    if not configured():
+        return 0
+    cutoff = (now - timedelta(days=max(1, retention_days))).isoformat()
+    response = requests.patch(
+        _endpoint(),
+        params={"status": "eq.suppressed", "updated_at": f"lt.{cutoff}"},
+        headers={**_headers(), "Prefer": "return=representation"},
+        json={"status": "expired", "updated_at": now.isoformat()},
+        timeout=20,
+    )
+    response.raise_for_status()
+    try:
+        return len(response.json())
+    except ValueError:
+        return 0
 
 
 def _listing_quality(listing: dict) -> int:
@@ -162,7 +275,10 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: da
         # Missing crawler facts should stay available for review, not erase
         # previously confirmed facts.
         previous_listing = before.get("listing") or {}
-        for field in ("title", "store", "deadline", "start_at", "conditions"):
+        for field in (
+            "title", "store", "deadline", "start_at", "conditions",
+            "result_announcement_at", "result_url", "result_notification_enabled", "result_notified_at",
+        ):
             value = listing.get(field)
             if (value is None or value == "" or value == []) and previous_listing.get(field):
                 listing[field] = previous_listing[field]
@@ -172,9 +288,10 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: da
             if field in overrides:
                 listing[field] = overrides[field]
         current_status = before.get("status", "pending")
-        # Published records are kept as history, but are automatically removed
-        # from the public Website once their deadline passes.
-        if current_status == "published" and _expired(listing, now):
+        # A deadline that is already past is never worth an approval task.
+        # Published records disappear from the Website; pending records skip
+        # the review queue and both remain as non-public history.
+        if current_status in {"published", "pending"} and _expired(listing, now):
             current_status = "expired"
         row = {
             "application_url": url,
@@ -190,7 +307,11 @@ def build_sync_rows(items: Iterable[Lottery], existing: dict[str, dict], now: da
     return list(rows_by_url.values())
 
 
-def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict[str, str] | None:
+def sync_statuses(
+    items: Iterable[Lottery],
+    now: datetime | None = None,
+    rejected_history_days: int = 60,
+) -> dict[str, str] | None:
     """Upsert collected listings and return their current publication states.
 
     ``None`` means that Supabase is not configured; this keeps the old
@@ -203,16 +324,9 @@ def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict
     headers = _headers()
     # ``listing`` is required here too: it preserves staff-confirmed facts and
     # lets us expire a published entry even when its source later disappears.
-    response = requests.get(
-        endpoint,
-        params={"select": "application_url,status,note,overrides,listing"},
-        headers=headers,
-        timeout=20,
-    )
-    response.raise_for_status()
     existing = {
         canonical_application_url(row["application_url"]): row
-        for row in response.json()
+        for row in _all_listing_rows("application_url,status,note,overrides,listing")
         if row.get("application_url")
     }
     rows = build_sync_rows(items, existing, now)
@@ -224,7 +338,7 @@ def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict
         listing = before.get("listing") or {}
         if (
             url not in seen_urls
-            and before.get("status") == "published"
+            and before.get("status") in {"published", "pending"}
             and _expired(listing, now)
         ):
             rows.append(
@@ -240,4 +354,8 @@ def sync_statuses(items: Iterable[Lottery], now: datetime | None = None) -> dict
         upsert_headers = {**headers, "Prefer": "resolution=merge-duplicates"}
         response = requests.post(endpoint, params={"on_conflict": "application_url"}, headers=upsert_headers, json=rows, timeout=20)
         response.raise_for_status()
+    if now is not None:
+        archived = archive_stale_suppressed(now, rejected_history_days)
+        if archived:
+            print(f"ARCHIVED old rejected listings: {archived}")
     return {row["application_url"]: row["status"] for row in rows}

@@ -39,6 +39,9 @@ jobs:
           ADMIN_QUEUE_URL: ${{ secrets.ADMIN_QUEUE_URL }}
           ADMIN_QUEUE_KEY: ${{ secrets.ADMIN_QUEUE_KEY }}
           ADMIN_DISCORD_WEBHOOK_URL: ${{ secrets.ADMIN_DISCORD_WEBHOOK_URL }}
+          # Optional separate channel for result-check reminders. If omitted,
+          # staff-enabled reminders use the normal production webhook instead.
+          RESULT_DISCORD_WEBHOOK_URL: ${{ secrets.RESULT_DISCORD_WEBHOOK_URL }}
           ADMIN_DASHBOARD_URL: https://20001111.github.io/card-lottery-watcher/admin.html
           CALENDAR_URL: https://20001111.github.io/card-lottery-watcher/
           SUPABASE_URL: https://ziuuxvcomyhnrleoecdq.supabase.co

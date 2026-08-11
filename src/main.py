@@ -13,15 +13,22 @@ from bs4 import BeautifulSoup
 
 from .ai_extract import extract_with_ai, page_document
 from .calendar import build_calendar
-from .discord_notify import send_management_dashboard_update, send_review_queue_update, send_site_update
+from .discord_notify import (
+    send_management_dashboard_update,
+    send_result_reminder,
+    send_review_queue_update,
+    send_site_update,
+)
 from .eligibility import evaluate
 from .models import Lottery, canonical_application_url, deduplicate_lotteries, lottery_identity, notification_identity
-from .moderation import suppressed_urls
 from .supabase_sync import configured as supabase_configured
 from .supabase_sync import (
     known_application_urls,
     manual_review_sources,
+    due_result_notifications,
+    mark_result_notified,
     record_source_failure,
+    published_listings,
     sync_statuses,
 )
 from .x_discovery import candidate_sources
@@ -217,8 +224,6 @@ def lottery_from_raw(raw: dict, source: dict) -> Lottery:
         deadline=raw.get("deadline"),
         start_at=raw.get("start_at"),
         conditions=list(raw.get("requirements") or []),
-        application_method=raw.get("application_method", "unknown"),
-        receipt_method=raw.get("receipt_method", "unknown"),
         source_kind=source.get("kind", "discovery"),
         official_confirmed=source.get("kind") == "official" or bool(raw.get("official_confirmed")),
     )
@@ -339,8 +344,10 @@ def retain_open_previous(collected: dict[str, Lottery], old: dict[str, dict], no
 
 def prepare_items(collected: dict[str, Lottery], old_by_url: dict[str, dict], config: dict) -> list[Lottery]:
     """Apply URL deduplication, moderator decisions, and eligibility checks."""
-    blocked = suppressed_urls()
-    items = [item for item in deduplicate_lotteries(collected.values()) if canonical_application_url(item.application_url) not in blocked]
+    # Supabase is the single source of truth for approve/reject/restore.
+    # Do not apply the retired local moderation file here: it could otherwise
+    # hide an item that an officer has restored in the web dashboard.
+    items = deduplicate_lotteries(collected.values())
     for item in items:
         previous = old_by_url.get(notification_identity(item.store, item.title, item.application_url))
         if previous:
@@ -381,7 +388,13 @@ def publish(items: list[Lottery], calendar_items: list[dict], config: dict) -> N
     build_calendar(calendar_items, ROOT / "docs", config.get("timezone", "Asia/Tokyo"))
 
 
-def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, publish_public: bool) -> None:
+def notify(
+    new_items: list[Lottery],
+    started_items: list[Lottery],
+    queued: int,
+    publish_public: bool,
+    now: datetime,
+) -> None:
     webhook = os.getenv("DISCORD_WEBHOOK_URL")
     daily = os.getenv("DAILY_SITE_UPDATE", "").lower() == "true"
     # A manual development run is an explicit test request, so it must always
@@ -403,6 +416,18 @@ def notify(new_items: list[Lottery], started_items: list[Lottery], queued: int, 
         send_management_dashboard_update(admin_webhook, dashboard_url, queued)
         if queued and not daily:
             send_review_queue_update(admin_webhook, queued, dashboard_url)
+    # Results are deliberately opt-in per listing in the admin dashboard.
+    # Send them only during the scheduled production update, never while a
+    # developer is testing collection in the private channel.
+    if publish_public and daily:
+        result_webhook = os.getenv("RESULT_DISCORD_WEBHOOK_URL") or webhook
+        if result_webhook:
+            try:
+                for record in due_result_notifications(now):
+                    send_result_reminder(result_webhook, record)
+                    mark_result_notified(record["application_url"], record["listing"], now)
+            except Exception as exc:
+                print(f"WARN result notification: {exc}")
 
 
 def main() -> None:
@@ -429,7 +454,15 @@ def main() -> None:
     # Website and the production Discord channel are protected by
     # ``publish_public`` below.
     try:
-        statuses = sync_statuses(items, now) if supabase_configured() else None
+        statuses = (
+            sync_statuses(
+                items,
+                now,
+                int(config.get("rejected_history_days", 60)),
+            )
+            if supabase_configured()
+            else None
+        )
     except Exception as exc:
         # Do not replace the Website with an empty page if Supabase is down.
         # The next run will retry and the previous published Website remains.
@@ -438,10 +471,19 @@ def main() -> None:
     if statuses is None:
         public_calendar_items = calendar_items
     else:
-        public_calendar_items = [
-            item for item in calendar_items
-            if statuses.get(canonical_application_url(item.get("application_url", ""))) == "published"
-        ]
+        # Supabase is the public Website's source of truth.  Do not build the
+        # page only from today's crawler output: a source may time out even
+        # though an officer has already approved a still-open listing.
+        try:
+            public_calendar_items = published_listings(now)
+        except Exception as exc:
+            # Keep the older safe fallback if Supabase can be read during the
+            # sync but not during this second request.
+            print(f"WARN published listing read: {exc}")
+            public_calendar_items = [
+                item for item in calendar_items
+                if statuses.get(canonical_application_url(item.get("application_url", ""))) == "published"
+            ]
         # A start alert is useful only for a listing the officers have already
         # approved for the public Website.
         started_items = [
@@ -450,7 +492,7 @@ def main() -> None:
         ]
     if publish_public:
         publish(items, public_calendar_items, config)
-    notify(new_items, started_items, queued, publish_public)
+    notify(new_items, started_items, queued, publish_public, now)
     print(f"SUMMARY sources={source_count} extracted={extracted_count} public={len(items)} new={len(new_items)} started={len(started_items)} review_needed={queued}")
 
 

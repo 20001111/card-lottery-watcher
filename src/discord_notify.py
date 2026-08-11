@@ -68,6 +68,32 @@ def send_new(webhook_url: str, item, calendar_url: str | None = None):
     return response.json()["id"]
 
 
+def send_result_reminder(webhook_url: str, record: dict):
+    """Post a single result-check reminder configured by an officer."""
+    listing = record.get("listing") or {}
+    destination = listing.get("result_url") or record.get("application_url")
+    title = listing.get("title") or "抽選結果の確認"
+    store = listing.get("store") or "店舗未確認"
+    announced_at = listing.get("result_announcement_at") or "本日"
+    payload = {
+        "content": "📣 抽選結果を確認できます",
+        "embeds": [{
+            "title": title[:256],
+            "url": destination,
+            "color": 0x8B5CF6,
+            "description": (
+                f"**店舗**：{store}\n"
+                f"**結果発表**：{announced_at}\n"
+                f"[🔗 結果を確認する]({destination})"
+            ),
+            "footer": {"text": "カード抽選・結果確認"},
+        }],
+    }
+    response = requests.post(webhook_url, params={"wait": "true"}, json=payload, timeout=20)
+    response.raise_for_status()
+    return response.json()["id"]
+
+
 def send_site_update(
     webhook_url: str,
     new_count: int,

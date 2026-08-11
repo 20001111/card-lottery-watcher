@@ -54,8 +54,6 @@ class Lottery:
     official_confirmed: bool = False
     eligibility: str = "unknown"
     eligibility_reasons: list[str] = field(default_factory=list)
-    application_method: str = "unknown"
-    receipt_method: str = "unknown"
     status: str = "open"
     discord_message_id: Optional[str] = None
     # Kept in state so the Website can show NEW for a full day, rather than
@@ -152,8 +150,6 @@ def _merge_group(group: list[Lottery]) -> Lottery:
         official_confirmed=any(item.official_confirmed for item in group),
         eligibility=best.eligibility,
         eligibility_reasons=best.eligibility_reasons,
-        application_method=_first_value(ranked, "application_method"),
-        receipt_method=_first_value(ranked, "receipt_method"),
         status=best.status,
         discord_message_id=message_ids[0] if message_ids else None,
         first_seen_at=min(first_seen) if first_seen else None,

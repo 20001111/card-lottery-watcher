@@ -21,6 +21,10 @@ minimum_ai_confidence: 0.75
 # helps staff find and complete information without publishing guesses.
 candidate_minimum_ai_confidence: 0.45
 max_deadline_days: 45
+# Rejected listings leave the normal management list after this many days.
+# Their URL remains in history, so the collector will not spend AI calls on
+# the same old link again.
+rejected_history_days: 60
 # Official announcement pages are followed only for the first matching details.
 # This keeps costs and requests small while allowing dates and conditions to be verified.
 official_detail_link_limit: 2

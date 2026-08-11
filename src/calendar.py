@@ -169,13 +169,17 @@ def _lottery_list(entries: list[tuple[dict, datetime, datetime]], now: datetime,
         conditions = item.get("conditions") or []
         condition_text = " / ".join(conditions) or "\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057"
         condition_kind = "none" if not conditions else "has_conditions"
-        application = item.get("application_method", "unknown")
+        # Application/receipt classification was intentionally removed from the product.
+        # Older records may still have the values, but the Website no longer uses them.
+        application = "unknown"
         labels = []
         if condition_kind == "none": labels.append("\u8ffd\u52a0\u6761\u4ef6\u306e\u8a18\u8f09\u306a\u3057")
         elif condition_kind == "has_conditions": labels.append("\u8ffd\u52a0\u6761\u4ef6\u3042\u308a")
         if application == "online": labels.append("Web\u5fdc\u52df")
         elif application == "store": labels.append("\u5e97\u982d\u5fdc\u52df")
         tag_html = ''.join(f'<span class="tag">{escape(label)}</span>' for label in labels) or '<span class="tag muted">Web\u5fdc\u52df\u65b9\u6cd5\u306f\u8a73\u7d30\u3067\u78ba\u8a8d</span>'
+        # Do not show legacy Web/store application classifications.
+        tag_html = ''.join(f'<span class="tag">{escape(label)}</span>' for label in labels)
         url = escape(item.get("application_url", "#"), quote=True)
         status_label = "\U0001f7e2 \u4eca\u3059\u3050\u5fdc\u52df\u53ef" if is_active else "\U0001f534 \u307e\u3060\u5fdc\u52df\u3067\u304d\u307e\u305b\u3093"
         cards.append(

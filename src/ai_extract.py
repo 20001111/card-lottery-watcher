@@ -65,8 +65,6 @@ JSON以外は出力しないでください。"""
   "deadline":"タイムゾーン付きISO 8601",
   "application_url":"本文のページ内リンクに存在する正式な応募・詳細URL",
   "requirements":["応募条件"],
-  "application_method":"online または store または unknown",
-  "receipt_method":"delivery または store_pickup または unknown",
   "evidence":"受付期間と抽選である根拠を短く記載",
   "official_confirmed":true,
   "confidence":0.0
@@ -84,10 +82,6 @@ the evidence states the dates and application conditions you found.
 If an actual application link exists but either start_at or deadline is missing,
 also include it as an unconfirmed candidate with that value set to null. Never
 invent dates. It will go to the private review dashboard, not the public site.
-application_method is about applying: online means a Web/app form can be used;
-store means the application itself requires visiting a store. receipt_method is
-about receiving the product: delivery means it is shipped; store_pickup means a
-visit is required after winning. Use unknown unless the page explicitly says it.
 """
     response = requests.post(
         API_URL,
@@ -129,10 +123,6 @@ visit is required after winning. Use unknown unless the page explicitly says it.
             continue
         if item.get("card_type") not in ("pokemon", "onepiece"):
             continue
-        if item.get("application_method") not in ("online", "store", "unknown"):
-            item["application_method"] = "unknown"
-        if item.get("receipt_method") not in ("delivery", "store_pickup", "unknown"):
-            item["receipt_method"] = "unknown"
         if source.get("require_official_confirmation") and item.get("official_confirmed") is not True:
             continue
         if source.get("require_official_confirmation") and not item.get("evidence"):
