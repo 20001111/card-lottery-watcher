@@ -334,11 +334,17 @@ def retain_open_previous(collected: dict[str, Lottery], old: dict[str, dict], no
         if canonical_application_url(previous.get("application_url", "")) in fresh_urls:
             continue
         try:
-            deadline = datetime.fromisoformat(previous.get("deadline", "").replace("Z", "+00:00"))
+            # Older and pending records can legitimately have no deadline.
+            # Treat those records as non-retainable rather than aborting the
+            # entire scheduled collection run.
+            deadline_value = previous.get("deadline")
+            if not isinstance(deadline_value, str) or not deadline_value.strip():
+                continue
+            deadline = datetime.fromisoformat(deadline_value.replace("Z", "+00:00"))
             deadline = deadline.replace(tzinfo=now.tzinfo) if deadline.tzinfo is None else deadline
             if deadline > now:
                 collected[item_id] = Lottery(**previous)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, AttributeError):
             continue
 
 
